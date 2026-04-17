@@ -1,0 +1,57 @@
+<section class="page">
+  <div class="page__header">
+    <div class="page__header-left">
+      <h1>Jurados Registrados</h1>
+      <p>Consulte, filtre y gestione los jurados asignados al proceso electoral.</p>
+    </div>
+    <button class="page__btn-nuevo" routerLink="/jurado/sorteo">+ Registrar Jurado</button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="page__filtros">
+    <select [(ngModel)]="filtroTipo" (change)="onFiltrar()">
+      <option value="">Todos los tipos</option>
+      <option value="PRESIDENTE">Presidente</option>
+      <option value="SECRETARIO">Secretario</option>
+      <option value="VOCAL">Vocal</option>
+      <option value="DOMICILIARIO">Domiciliario</option>
+    </select>
+
+    <select [(ngModel)]="filtroEstado" (change)="onFiltrar()">
+      <option value="">Todos los estados</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="CAPACITADO">Capacitado</option>
+      <option value="NO_PRESENTADO">No Presentado</option>
+    </select>
+
+    <input
+      type="text"
+      placeholder="Buscar por nombre o documento..."
+      [(ngModel)]="filtroBusqueda"
+      (input)="onFiltrar()"
+    />
+  </div>
+
+  <!-- Lista -->
+  <div class="page__grid" *ngIf="juradosFiltrados.length > 0; else sinResultados">
+    <app-jurado-card
+      *ngFor="let jurado of juradosFiltrados"
+      [jurado]="jurado"
+      (verDetalle)="onVerDetalle($event)"
+      (eliminar)="onEliminar($event)"
+    ></app-jurado-card>
+  </div>
+
+  <ng-template #sinResultados>
+    <div class="page__empty">
+      <p>No se encontraron jurados con los filtros seleccionados.</p>
+    </div>
+  </ng-template>
+
+  <app-toast
+    *ngIf="showToast"
+    [message]="toastMessage"
+    [type]="toastType"
+    (close)="onCloseToast()"
+  ></app-toast>
+</section>

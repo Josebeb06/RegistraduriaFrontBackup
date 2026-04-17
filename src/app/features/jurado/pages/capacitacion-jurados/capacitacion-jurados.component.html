@@ -1,0 +1,93 @@
+<section class="page">
+  <div class="page__header">
+    <h1>Capacitación de Jurados</h1>
+    <p>Gestione el estado de capacitación de los jurados asignados al proceso electoral.</p>
+  </div>
+
+  <!-- Estadísticas rápidas -->
+  <div class="page__stats">
+    <div class="stat stat--total">
+      <span class="stat__numero">{{ totalJurados }}</span>
+      <span class="stat__label">Total Jurados</span>
+    </div>
+    <div class="stat stat--capacitado">
+      <span class="stat__numero">{{ totalCapacitados }}</span>
+      <span class="stat__label">Capacitados</span>
+    </div>
+    <div class="stat stat--pendiente">
+      <span class="stat__numero">{{ totalPendientes }}</span>
+      <span class="stat__label">Pendientes</span>
+    </div>
+    <div class="stat stat--no-presentado">
+      <span class="stat__numero">{{ totalNoPresentados }}</span>
+      <span class="stat__label">No Presentados</span>
+    </div>
+  </div>
+
+  <!-- Tabla de capacitación -->
+  <div class="page__tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Documento</th>
+          <th>Tipo</th>
+          <th>Mesa</th>
+          <th>Fecha Capacitación</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let jurado of jurados">
+          <td>{{ jurado.nombres }} {{ jurado.apellidos }}</td>
+          <td>{{ jurado.numeroDoc }}</td>
+          <td>
+            <span class="badge badge--tipo">{{ jurado.juradoTipo }}</span>
+          </td>
+          <td>Mesa {{ jurado.numeroMesa }}</td>
+          <td>{{ jurado.fechaCapacitacion | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'badge--capacitado': jurado.estadoCapacitacion === 'CAPACITADO',
+                'badge--pendiente': jurado.estadoCapacitacion === 'PENDIENTE',
+                'badge--no-presentado': jurado.estadoCapacitacion === 'NO_PRESENTADO',
+              }"
+            >
+              {{ jurado.estadoCapacitacion }}
+            </span>
+          </td>
+          <td class="acciones">
+            <button
+              class="btn btn--capacitar"
+              *ngIf="jurado.estadoCapacitacion !== 'CAPACITADO'"
+              (click)="onMarcarCapacitado(jurado.id)"
+            >
+              ✔ Capacitado
+            </button>
+            <button
+              class="btn btn--no-presentado"
+              *ngIf="jurado.estadoCapacitacion !== 'NO_PRESENTADO'"
+              (click)="onMarcarNoPresentado(jurado.id)"
+            >
+              ✖ No Presentado
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="page__empty" *ngIf="jurados.length === 0">
+      <p>No hay jurados registrados aún.</p>
+    </div>
+  </div>
+
+  <app-toast
+    *ngIf="showToast"
+    [message]="toastMessage"
+    [type]="toastType"
+    (close)="onCloseToast()"
+  ></app-toast>
+</section>
