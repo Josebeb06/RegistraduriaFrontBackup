@@ -3,16 +3,13 @@
   <div class="dashboard__hero">
     <div class="dashboard__hero-left">
       <span class="badge">Panel principal del registrador</span>
-
       <h1>Gestione lo esencial del proceso electoral desde un solo lugar.</h1>
-
       <p>
         Acceda rápidamente a las funciones más importantes del sistema. Interfaz clara,
         institucional y eficiente.
       </p>
     </div>
 
-    <!-- CARD DERECHA -->
     <div class="dashboard__hero-card">
       <h3>Acceso rápido</h3>
       <ul>
@@ -23,13 +20,16 @@
     </div>
   </div>
 
-  <!-- ACCIONES -->
+  <!-- SECCIÓN: Candidatos y Elecciones -->
+  <div class="dashboard__section-title">
+    <h2>Candidatos y Elecciones</h2>
+  </div>
+
   <div class="dashboard__actions">
     <div class="card">
       <div class="icon">👤</div>
       <h3>Crear candidato</h3>
       <p>Registre un nuevo candidato de forma rápida.</p>
-
       <button routerLink="/candidato/crear" class="btn">Crear candidato</button>
     </div>
 
@@ -37,7 +37,6 @@
       <div class="icon">📋</div>
       <h3>Candidatos registrados</h3>
       <p>Consulte la lista actual de candidatos.</p>
-
       <button routerLink="/candidato/listar" class="btn">Ver candidatos</button>
     </div>
 
@@ -45,19 +44,46 @@
       <div class="icon">🗳️</div>
       <h3>Configurar elecciones</h3>
       <p>Cree y administre elecciones del sistema.</p>
-
       <button routerLink="/eleccion/crear" class="btn">Configurar elección</button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: Gestión de Jurados ← NUEVO -->
+  <div class="dashboard__section-title">
+    <h2>Gestión de Jurados</h2>
+  </div>
+
+  <div class="dashboard__actions">
+    <div class="card">
+      <div class="icon">🎲</div>
+      <h3>Sorteo de Jurados</h3>
+      <p>Designe ciudadanos como jurados mediante sorteo aleatorio o registro manual.</p>
+      <button routerLink="/jurado/sorteo" class="btn">Ir a sorteo</button>
+    </div>
+
+    <div class="card">
+      <div class="icon">👥</div>
+      <h3>Jurados Registrados</h3>
+      <p>Consulte, filtre y gestione los jurados asignados al proceso electoral.</p>
+      <button routerLink="/jurado/listar" class="btn">Ver jurados</button>
+    </div>
+
+    <div class="card">
+      <div class="icon">🎓</div>
+      <h3>Capacitación de Jurados</h3>
+      <p>Gestione el estado de capacitación de cada jurado asignado.</p>
+      <button routerLink="/jurado/capacitacion" class="btn">Ver capacitación</button>
     </div>
   </div>
 
   <!-- INFO -->
   <div class="dashboard__info">
-    <h3>Información para continuar</h3>
-
+    <h3>Flujo recomendado</h3>
     <div class="steps">
-      <div class="step">Crear candidatos</div>
-      <div class="step">Revisar lista</div>
-      <div class="step">Configurar elección</div>
+      <div class="step">1. Crear candidatos</div>
+      <div class="step">2. Configurar elección</div>
+      <div class="step">3. Ejecutar sorteo de jurados</div>
+      <div class="step">4. Gestionar capacitación</div>
     </div>
   </div>
 </section>

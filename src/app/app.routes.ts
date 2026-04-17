@@ -29,6 +29,14 @@ export const routes: Routes = [
   },
 
   /**
+   * JURADOS ← NUEVO
+   */
+  {
+    path: 'jurado',
+    loadChildren: () => import('./features/jurado/jurado.module').then((m) => m.JuradoModule),
+  },
+
+  /**
    * RUTA FALLBACK (si escriben mal la URL)
    */
   {
