@@ -1,0 +1,21 @@
+.header {
+  background-color: #002d57;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+
+  &__logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  &__nav button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 1rem;
+    cursor: pointer;
+  }
+}

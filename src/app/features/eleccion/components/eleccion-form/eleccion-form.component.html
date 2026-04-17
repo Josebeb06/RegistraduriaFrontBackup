@@ -1,0 +1,69 @@
+<form [formGroup]="eleccionForm" (ngSubmit)="onSubmit()" class="form">
+  <h2 class="form__title">Datos de la Elección</h2>
+
+  <!-- Nombre -->
+  <div class="form__group">
+    <label for="nombre">Nombre</label>
+    <input
+      id="nombre"
+      type="text"
+      formControlName="nombre"
+      [class.invalid]="nombre?.invalid && nombre?.touched"
+    />
+    <small *ngIf="nombre?.invalid && nombre?.touched">
+      El nombre es obligatorio (mínimo 5 caracteres)
+    </small>
+  </div>
+
+  <!-- Tipo -->
+  <div class="form__group">
+    <label for="tipo">Tipo de Elección</label>
+    <select id="tipo" formControlName="tipo" [class.invalid]="tipo?.invalid && tipo?.touched">
+      <option value="">Seleccione...</option>
+      <option value="CONSULTA">Consulta</option>
+      <option value="PRESIDENCIAL">Presidencial</option>
+      <option value="LEGISLATIVA">Legislativa</option>
+      <option value="LOCAL">Local</option>
+    </select>
+    <small *ngIf="tipo?.invalid && tipo?.touched">Debe seleccionar un tipo</small>
+  </div>
+
+  <!-- Fechas -->
+  <div class="form__row">
+    <div class="form__group">
+      <label for="fechaInicio">Fecha Inicio</label>
+      <input id="fechaInicio" type="datetime-local" formControlName="fechaInicio" />
+    </div>
+
+    <div class="form__group">
+      <label for="fechaFinalizacion">Fecha Fin</label>
+      <input id="fechaFinalizacion" type="datetime-local" formControlName="fechaFinalizacion" />
+    </div>
+  </div>
+
+  <!-- Error fechas -->
+  <small class="error" *ngIf="eleccionForm.errors?.['fechasInvalidas']">
+    La fecha fin debe ser posterior a la fecha inicio
+  </small>
+
+  <!-- Lista abierta -->
+  <div class="form__group">
+    <label>
+      <input
+        type="checkbox"
+        [checked]="listaAbierta?.value"
+        (change)="listaAbierta?.setValue($event.target.checked)"
+      />
+      Lista Abierta
+    </label>
+  </div>
+
+  <!-- ID Registrador -->
+  <div class="form__group">
+    <label for="idRegistrador">ID Registrador</label>
+    <input id="idRegistrador" type="number" formControlName="idRegistrador" />
+  </div>
+
+  <!-- Botón -->
+  <button type="submit" class="form__button">Crear Elección</button>
+</form>

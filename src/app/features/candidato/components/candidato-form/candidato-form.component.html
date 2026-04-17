@@ -1,0 +1,62 @@
+<form [formGroup]="candidatoForm" (ngSubmit)="onSubmit()" class="form">
+  <h2 class="form__title">Registro de Candidato</h2>
+
+  <!-- Nombre -->
+  <div class="form__group">
+    <label>Nombre</label>
+    <input
+      type="text"
+      formControlName="nombre"
+      [class.invalid]="nombre?.invalid && nombre?.touched"
+    />
+    <small *ngIf="nombre?.invalid && nombre?.touched">
+      Nombre obligatorio (mínimo 3 caracteres)
+    </small>
+  </div>
+
+  <!-- Número -->
+  <div class="form__group">
+    <label>Número</label>
+    <input
+      type="text"
+      formControlName="numero"
+      [class.invalid]="numero?.invalid && numero?.touched"
+    />
+    <small *ngIf="numero?.invalid && numero?.touched"> Número obligatorio </small>
+  </div>
+
+  <!-- Foto URL -->
+  <div class="form__group">
+    <label>Foto del Candidato (URL)</label>
+    <input
+      type="text"
+      formControlName="fotoUrl"
+      [class.invalid]="fotoUrl?.invalid && fotoUrl?.touched"
+    />
+    <small *ngIf="fotoUrl?.invalid && fotoUrl?.touched"> URL requerida </small>
+  </div>
+
+  <!-- Logo Partido -->
+  <div class="form__group">
+    <label>Logo del Partido (URL)</label>
+    <input
+      type="text"
+      formControlName="partidoLogoUrl"
+      [class.invalid]="partidoLogoUrl?.invalid && partidoLogoUrl?.touched"
+    />
+    <small *ngIf="partidoLogoUrl?.invalid && partidoLogoUrl?.touched"> URL requerida </small>
+  </div>
+
+  <!-- ID Registrador -->
+  <div class="form__group">
+    <label>ID Registrador</label>
+    <input
+      type="number"
+      formControlName="idRegistrador"
+      [class.invalid]="idRegistrador?.invalid && idRegistrador?.touched"
+    />
+  </div>
+
+  <!-- Botón -->
+  <button type="submit" class="form__button">Crear Candidato</button>
+</form>

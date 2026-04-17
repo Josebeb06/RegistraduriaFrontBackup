@@ -1,0 +1,38 @@
+<div class="container">
+  <h1>Listado de Candidatos</h1>
+
+  <!-- Loading -->
+  <p *ngIf="loading">Cargando candidatos...</p>
+
+  <!-- Error -->
+  <p *ngIf="error">Error al cargar candidatos</p>
+
+  <!-- Tabla -->
+  <table *ngIf="!loading && !error">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Número</th>
+        <th>Foto</th>
+        <th>Partido</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let c of candidatos">
+        <td>{{ c.idCandidato }}</td>
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.numero }}</td>
+
+        <td>
+          <img [src]="c.fotoUrl" alt="foto" width="50" />
+        </td>
+
+        <td>
+          <img [src]="c.partidoLogoUrl" alt="logo" width="50" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

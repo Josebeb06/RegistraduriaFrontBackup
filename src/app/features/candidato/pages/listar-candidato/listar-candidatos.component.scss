@@ -1,0 +1,36 @@
+.container {
+  padding: 1.5rem;
+  background: #f3f4f6;
+  border-radius: 12px;
+}
+
+h1 {
+  color: #002d57;
+  border-bottom: 2px solid #c5a059;
+  padding-bottom: 0.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+
+  th {
+    background: #002d57;
+    color: white;
+    padding: 0.8rem;
+    text-align: left;
+  }
+
+  td {
+    padding: 0.6rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  tr:hover {
+    background: #f9fafb;
+  }
+}

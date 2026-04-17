@@ -1,0 +1,39 @@
+.page {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  padding: 2rem;
+
+  &__header {
+    margin-bottom: 2rem;
+
+    h1 {
+      color: #002d57;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+
+    border-bottom: 2px solid #c5a059;
+    padding-bottom: 0.5rem;
+  }
+
+  &__content {
+    display: flex;
+    justify-content: center;
+  }
+
+  &__card {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    border-top: 4px solid #002d57;
+  }
+}

@@ -1,0 +1,30 @@
+<section class="crear-eleccion">
+  <header class="crear-eleccion__header">
+    <h1 class="crear-eleccion__title">Crear Elección</h1>
+    <p class="crear-eleccion__subtitle">
+      Configura una nueva elección dentro del sistema electoral
+    </p>
+  </header>
+
+  <div class="crear-eleccion__container">
+    <!-- Panel izquierdo -->
+    <div class="crear-eleccion__info">
+      <h2>Información</h2>
+      <p>Complete los datos necesarios para registrar una nueva elección.</p>
+
+      <ul>
+        <li>Defina el nombre de la elección</li>
+        <li>Seleccione el tipo</li>
+        <li>Configure fechas correctamente</li>
+      </ul>
+    </div>
+
+    <!-- Panel derecho -->
+    <div class="crear-eleccion__form-container">
+      <!-- AQUÍ ESTÁ LA CONEXIÓN -->
+      <app-eleccion-form (formSubmit)="onCrearEleccion($event)"></app-eleccion-form>
+    </div>
+  </div>
+  <app-toast *ngIf="showToast" [message]="toastMessage" [type]="toastType" (close)="onCloseToast()">
+  </app-toast>
+</section>
