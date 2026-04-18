@@ -12,6 +12,40 @@ El acceso externo se realiza mediante **Cloudflare Quick Tunnel** (URL temporal 
 
 ---
 
+## Acceso Remoto a las VMs
+
+Se asume que Java, Maven y Docker ya están instalados en las VMs respectivas.
+
+### Opción A — SSH (terminal)
+
+Desde cualquier equipo en la red o con acceso a las VMs:
+
+```bash
+# Conectarse al VM del backend
+ssh estudiante@10.43.100.131
+
+# Conectarse al VM del frontend
+ssh estudiante@10.43.97.237
+```
+
+Si pide contraseña, ingresar la del usuario `estudiante` en cada VM.
+
+En Windows, abrir **PowerShell** o **CMD** y ejecutar el mismo comando `ssh` (viene instalado por defecto en Windows 10/11).
+
+### Opción B — Escritorio Remoto (xrdp / RDP)
+
+Las VMs tienen `xrdp` instalado y activo. Para acceder con interfaz gráfica:
+
+1. En Windows: presionar `Win + R`, escribir `mstsc` y presionar Enter
+2. En el campo **Equipo** ingresar la IP de la VM (`10.43.100.131` o `10.43.97.237`)
+3. Hacer clic en **Conectar**
+4. Ingresar usuario `estudiante` y la contraseña correspondiente
+5. Una vez dentro, abrir una **Terminal** desde el escritorio o el menú de aplicaciones
+
+> Desde la terminal del escritorio remoto se ejecutan exactamente los mismos comandos que se muestran en esta guía.
+
+---
+
 ## Requisitos en cada VM
 
 ### VM Frontend (`10.43.97.237`)
@@ -114,10 +148,27 @@ sudo systemctl disable nginx
 
 ### 2.2 Subir el código (si no está ya en el VM)
 
-Desde la máquina local con Windows, copiar el proyecto al VM (excluyendo `node_modules`):
+**Opción A — Desde acceso remoto al VM (SSH o xrdp):**
+
+Si el repositorio ya está en la VM o está disponible en git, clonarlo directamente desde la terminal del VM:
+
+```bash
+cd ~
+git clone <URL_DEL_REPOSITORIO> Vote4TechRegistraduriaFront
+```
+
+Si ya existe la carpeta y solo se quieren traer los últimos cambios:
+
+```bash
+cd ~/Vote4TechRegistraduriaFront
+git pull
+```
+
+**Opción B — Desde PowerShell local (Windows):**
+
+Copiar el proyecto al VM excluyendo `node_modules`:
 
 ```powershell
-# Ejecutar en PowerShell local
 robocopy "C:\ruta\al\Vote4TechRegistraduriaFront" "$env:TEMP\vote4tech-front-deploy" /E /XD node_modules .angular
 scp -r "$env:TEMP\vote4tech-front-deploy" estudiante@10.43.97.237:~/Vote4TechRegistraduriaFront
 ```
