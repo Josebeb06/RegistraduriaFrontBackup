@@ -17,17 +17,10 @@ import { EleccionService } from '../../../eleccion/services/eleccion.service';
   styleUrls: ['./capacitacion-jurados.component.scss'],
 })
 export class CapacitacionJuradosComponent implements OnInit {
-  // 🔹 Elecciones
   elecciones: { idEleccion: number; nombre: string }[] = [];
   eleccionSeleccionada: number | null = null;
 
-  // 🔹 Dashboard (stats)
   dashboard: DashboardEleccionDTO | null = null;
-  totalJurados = 0;
-  totalAsignados = 0; // ahora son CAPACITADOS
-  totalPendientes = 0;
-
-  // 🔹 Jurados
   jurados: ResponseEleccionJuradoDTO[] = [];
 
   showToast = false;
@@ -50,6 +43,12 @@ export class CapacitacionJuradosComponent implements OnInit {
           idEleccion: e.idEleccion,
           nombre: e.nombre,
         }));
+
+        // BONUS UX: selecciona automáticamente la primera elección
+        if (this.elecciones.length > 0) {
+          this.eleccionSeleccionada = this.elecciones[0].idEleccion;
+          this.onSeleccionarEleccion();
+        }
       },
       error: () => this.mostrarToast('Error al cargar elecciones', 'error'),
     });
@@ -65,11 +64,6 @@ export class CapacitacionJuradosComponent implements OnInit {
     this.juradoService.getDashboard(this.eleccionSeleccionada!).subscribe({
       next: (data) => {
         this.dashboard = data;
-
-        // ✅ FIX: mapear correctamente
-        this.totalJurados = data.totalJurados;
-        this.totalAsignados = data.capacitados;
-        this.totalPendientes = data.pendientes;
       },
       error: () => this.mostrarToast('Error al cargar dashboard', 'error'),
     });
@@ -84,7 +78,6 @@ export class CapacitacionJuradosComponent implements OnInit {
     });
   }
 
-  // ✅ NUEVO: usar estado en lugar de asignado
   getEstadoClass(estado: string): string {
     const clases: Record<string, string> = {
       CAPACITADO: 'badge--capacitado',

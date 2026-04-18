@@ -54,6 +54,7 @@
         <h3>Detalle del Jurado</h3>
         <button class="modal__close" (click)="onCerrarDetalle()">✕</button>
       </div>
+
       <div class="modal__body">
         <p><span class="modal__label">Ciudadano:</span> {{ juradoSeleccionado.nombreCiudadano }}</p>
         <p><span class="modal__label">Género:</span> {{ juradoSeleccionado.generoCiudadano }}</p>
@@ -64,6 +65,7 @@
           <span class="modal__label">Capacitación:</span>
           {{ juradoSeleccionado.fechaCapacitacion | date: 'dd/MM/yyyy' }}
         </p>
+
         <p>
           <span class="modal__label">Estado:</span>
           <span class="badge" [ngClass]="getEstadoClass(juradoSeleccionado.estado)">

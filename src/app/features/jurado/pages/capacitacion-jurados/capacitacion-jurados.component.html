@@ -4,25 +4,41 @@
     <p>Consulte el estado de asignación y capacitación de los jurados del proceso electoral.</p>
   </div>
 
-  <!-- Estadísticas -->
+  <!-- Selector de elección (FIX CLAVE) -->
+  <div class="page__filtros">
+    <label>Seleccione la Elección</label>
+    <select [(ngModel)]="eleccionSeleccionada" (change)="onSeleccionarEleccion()">
+      <option [ngValue]="null">Seleccione una elección</option>
+      <option *ngFor="let e of elecciones" [ngValue]="e.idEleccion">
+        {{ e.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Estadísticas (USANDO DASHBOARD REAL) -->
   <div class="page__stats">
     <div class="stat stat--total">
-      <span class="stat__numero">{{ totalJurados }}</span>
+      <span class="stat__numero">{{ dashboard?.totalJurados || 0 }}</span>
       <span class="stat__label">Total Jurados</span>
     </div>
 
     <div class="stat stat--capacitado">
-      <span class="stat__numero">{{ totalAsignados }}</span>
+      <span class="stat__numero">{{ dashboard?.capacitados || 0 }}</span>
       <span class="stat__label">Capacitados</span>
     </div>
 
     <div class="stat stat--pendiente">
-      <span class="stat__numero">{{ totalPendientes }}</span>
+      <span class="stat__numero">{{ dashboard?.pendientes || 0 }}</span>
       <span class="stat__label">Pendientes</span>
+    </div>
+
+    <div class="stat stat--no-presentado">
+      <span class="stat__numero">{{ dashboard?.noPresentados || 0 }}</span>
+      <span class="stat__label">No Presentados</span>
     </div>
   </div>
 
-  <!-- Tabla -->
+  <!-- 🔹 Tabla -->
   <div class="page__tabla">
     <table>
       <thead>
@@ -47,7 +63,6 @@
           <td>{{ jurado.nombreEleccion }}</td>
           <td>{{ jurado.fechaCapacitacion | date: 'dd/MM/yyyy' }}</td>
           <td>
-            <!-- ✅ FIX COMPLETO -->
             <span class="badge" [ngClass]="getEstadoClass(jurado.estado)">
               {{ jurado.estado }}
             </span>

@@ -17,15 +17,12 @@ export class ListarJuradosComponent implements OnInit {
   jurados: ResponseEleccionJuradoDTO[] = [];
   juradosFiltrados: ResponseEleccionJuradoDTO[] = [];
 
-  // 🔹 Filtros
   filtroTipo = '';
   filtroEstado = '';
   filtroBusqueda = '';
 
-  // 🔹 Modal detalle
   juradoSeleccionado: ResponseEleccionJuradoDTO | null = null;
 
-  // 🔹 Toast
   showToast = false;
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
@@ -50,11 +47,6 @@ export class ListarJuradosComponent implements OnInit {
     });
   }
 
-  /**
-   * Filtros corregidos usando los valores reales del back
-   * tipoJurado real: 'URNA' | 'DOMICILIO'
-   * asignado real: boolean true | false
-   */
   onFiltrar(): void {
     this.juradosFiltrados = this.jurados.filter((j) => {
       const coincideTipo = this.filtroTipo ? j.tipoJurado === this.filtroTipo : true;
@@ -69,9 +61,6 @@ export class ListarJuradosComponent implements OnInit {
     });
   }
 
-  /**
-   * 🔹 Ver detalle abre modal con la info del jurado
-   */
   onVerDetalle(id: number): void {
     this.juradoSeleccionado = this.jurados.find((j) => j.idAsignacionJurado === id) ?? null;
   }
@@ -80,9 +69,6 @@ export class ListarJuradosComponent implements OnInit {
     this.juradoSeleccionado = null;
   }
 
-  /**
-   * 🔹 Eliminar local hasta que el back implemente el endpoint DELETE
-   */
   onEliminar(id: number): void {
     this.jurados = this.jurados.filter((j) => j.idAsignacionJurado !== id);
     this.onFiltrar();
@@ -91,6 +77,9 @@ export class ListarJuradosComponent implements OnInit {
     this.showToast = true;
   }
 
+  /**
+   * ✅ MAPEO REAL DEL BACK
+   */
   getEstadoClass(estado: string): string {
     const clases: Record<string, string> = {
       CAPACITADO: 'badge--capacitado',
