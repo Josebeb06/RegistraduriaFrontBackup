@@ -1,0 +1,28 @@
+# docker-compose para levantar el frontend en la VM 10.43.97.237
+# con Cloudflare Quick Tunnel (URL publica automatica, sin cuenta ni token).
+#
+# Uso:
+#   docker compose -f docker/docker-compose.prod.yml up -d --build
+#
+# Para ver la URL publica generada:
+#   docker logs vote4tech-cloudflared
+
+services:
+  frontend:
+    build:
+      context: ..          # raiz del repo Vote4TechRegistraduriaFront
+      dockerfile: Dockerfile
+    image: vote4tech-front:latest
+    container_name: vote4tech-front
+    ports:
+      - "80:80"            # acceso local dentro de la VM (lo usa cloudflared)
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: vote4tech-cloudflared
+    command: tunnel --no-autoupdate --url http://localhost:80
+    network_mode: host
+    depends_on:
+      - frontend
+    restart: unless-stopped

@@ -8,9 +8,10 @@ import { catchError } from 'rxjs/operators';
 })
 export class EleccionService {
   /**
-   * IMPORTANTE: endpoint real del backend
+   * IMPORTANTE: URL relativa para que Nginx (API Gateway) enrute al backend.
+   * Nginx en la VM front (10.43.97.237) hace proxy de /api/* → 10.43.100.131:8080
    */
-  private apiUrl = 'http://10.43.100.131:8080/eleccion';
+  private apiUrl = '/api/eleccion';
 
   constructor(private http: HttpClient) {}
 

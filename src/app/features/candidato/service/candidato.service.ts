@@ -18,7 +18,7 @@ import { throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class CandidatoService {
-  private apiUrl = 'http://10.43.100.131:8080/candidato';
+  private apiUrl = '/api/candidato';
 
   constructor(private http: HttpClient) {}
 

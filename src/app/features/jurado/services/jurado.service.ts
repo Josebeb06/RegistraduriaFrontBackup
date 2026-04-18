@@ -34,7 +34,7 @@ export interface DashboardEleccionDTO {
   providedIn: 'root',
 })
 export class JuradoService {
-  private apiUrl = 'http://10.43.100.131:8080/eleccion-jurado';
+  private apiUrl = '/api/eleccion-jurado';
 
   constructor(private http: HttpClient) {}
 
