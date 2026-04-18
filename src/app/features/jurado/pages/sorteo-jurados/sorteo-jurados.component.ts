@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JuradoFormComponent } from '../../components/jurado-form/jurado-form.component';
@@ -18,10 +18,11 @@ import { EleccionService } from '../../../eleccion/services/eleccion.service';
   styleUrls: ['./sorteo-jurados.component.scss'],
 })
 export class SorteoJuradosComponent implements OnInit {
-  // Elecciones del back para el select
-  elecciones: { idEleccion: number; nombre: string }[] = [];
+  @ViewChild(JuradoFormComponent)
+  juradoFormComponent!: JuradoFormComponent;
 
-  // Elección seleccionada para el sorteo y para el form
+  // Elecciones
+  elecciones: { idEleccion: number; nombre: string }[] = [];
   eleccionSorteoId: number | null = null;
 
   // Sorteo
@@ -36,6 +37,7 @@ export class SorteoJuradosComponent implements OnInit {
   constructor(
     private juradoService: JuradoService,
     private eleccionService: EleccionService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -49,18 +51,16 @@ export class SorteoJuradosComponent implements OnInit {
           idEleccion: e.idEleccion,
           nombre: e.nombre,
         }));
+
+        this.cdr.detectChanges(); // IMPORTANTE
       },
       error: () => {
-        this.toastMessage = 'Error al cargar elecciones';
-        this.toastType = 'error';
-        this.showToast = true;
+        this.mostrarToast('Error al cargar elecciones', 'error');
       },
     });
   }
 
-  /**
-   * Registro manual — idEleccion va en la URL
-   */
+  // Registro manual
   onRegistrarJurado(data: CreateEleccionJuradoDTO): void {
     if (!this.eleccionSorteoId) {
       this.mostrarToast('Seleccione una elección primero', 'error');
@@ -70,43 +70,60 @@ export class SorteoJuradosComponent implements OnInit {
     this.juradoService.crearJurado(this.eleccionSorteoId, data).subscribe({
       next: () => {
         this.mostrarToast('Jurado registrado correctamente', 'success');
+
+        // Reset form
+        this.juradoFormComponent.resetForm();
+
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        this.mostrarToast(err.message || 'Error al registrar jurado', 'error');
+        this.mostrarToast(err?.error?.message || 'Error al registrar jurado', 'error');
       },
     });
   }
 
+  // Sorteo automático
   onEjecutarSorteo(): void {
     if (!this.eleccionSorteoId) return;
 
     this.sorteando = true;
     this.resultadoSorteo = [];
+    this.cdr.detectChanges(); // para mostrar loading
 
     this.juradoService.ejecutarSorteo(this.eleccionSorteoId).subscribe({
       next: (resultado) => {
         this.resultadoSorteo = resultado;
         this.sorteando = false;
+
         this.mostrarToast('Sorteo ejecutado correctamente', 'success');
+
+        this.cdr.detectChanges(); // CLAVE (sin esto no se actualiza)
       },
       error: (err) => {
         this.sorteando = false;
-        this.mostrarToast(err.message || 'Error al ejecutar el sorteo', 'error');
+
+        this.mostrarToast(err?.error?.message || 'Error al ejecutar el sorteo', 'error');
+
+        this.cdr.detectChanges();
       },
     });
   }
 
-  /** ✅ FIX TOAST */
+  // 🔹 Toast FIX (zoneless compatible)
   mostrarToast(mensaje: string, tipo: 'success' | 'error') {
     this.showToast = false;
+
     setTimeout(() => {
       this.toastMessage = mensaje;
       this.toastType = tipo;
       this.showToast = true;
+
+      this.cdr.detectChanges(); // ESTE ES EL FIX REAL
     }, 0);
   }
 
   onCloseToast(): void {
     this.showToast = false;
+    this.cdr.detectChanges();
   }
 }

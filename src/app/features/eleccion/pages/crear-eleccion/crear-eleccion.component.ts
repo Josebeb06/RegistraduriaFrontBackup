@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EleccionFormComponent } from '../../components/eleccion-form/eleccion-form.component';
 import { EleccionService } from '../../services/eleccion.service';
@@ -12,40 +12,47 @@ import { ToastComponent } from '../../../../shared/components/toast/toast.compon
   styleUrls: ['./crear-eleccion.component.scss'],
 })
 export class CrearEleccionComponent {
-  // Estado del toast
+  @ViewChild(EleccionFormComponent)
+  eleccionFormComponent!: EleccionFormComponent;
+
+  // Toast
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
   showToast = false;
 
-  constructor(private eleccionService: EleccionService) {}
+  constructor(
+    private eleccionService: EleccionService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
-  /**
-   * Crear elección → conexión real con backend
-   */
   onCrearEleccion(data: any) {
     this.eleccionService.crearEleccion(data).subscribe({
       next: () => {
-        this.mostrarToast('Elección creada correctamente', 'success');
+        this.toastMessage = 'Elección creada correctamente';
+        this.toastType = 'success';
+        this.showToast = true;
+
+        // Reset del formulario
+        this.eleccionFormComponent.eleccionForm.reset({
+          listaAbierta: false,
+          idRegistrador: 1,
+        });
+
+        // Forzar actualización UI (zoneless)
+        this.cdr.detectChanges();
       },
       error: () => {
-        this.mostrarToast('Error al crear la elección', 'error');
+        this.toastMessage = 'Error al crear la elección';
+        this.toastType = 'error';
+        this.showToast = true;
+
+        this.cdr.detectChanges();
       },
     });
   }
 
-  mostrarToast(mensaje: string, tipo: 'success' | 'error') {
-    this.showToast = false;
-    setTimeout(() => {
-      this.toastMessage = mensaje;
-      this.toastType = tipo;
-      this.showToast = true;
-    }, 0);
-  }
-
-  /**
-   * Cerrar toast
-   */
   onCloseToast() {
     this.showToast = false;
+    this.cdr.detectChanges();
   }
 }

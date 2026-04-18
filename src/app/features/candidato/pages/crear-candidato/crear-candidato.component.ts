@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CandidatoFormComponent } from '../../components/candidato-form/candidato-form.component';
 import { CandidatoService } from '../../service/candidato.service';
@@ -12,41 +12,44 @@ import { ToastComponent } from '../../../../shared/components/toast/toast.compon
   styleUrls: ['./crear-candidato.component.scss'],
 })
 export class CrearCandidatoComponent {
-  // Estado del toast
+  @ViewChild(CandidatoFormComponent)
+  candidatoFormComponent!: CandidatoFormComponent;
+
+  // Toast
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
   showToast = false;
 
-  constructor(private candidatoService: CandidatoService) {}
+  constructor(
+    private candidatoService: CandidatoService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
-  /**
-   * Crear candidato → conexión real con backend
-   */
   onCrearCandidato(data: any) {
     this.candidatoService.createCandidato(data).subscribe({
-      next: (response) => {
-        console.log('Candidato creado:', response);
+      next: () => {
+        this.toastMessage = 'Candidato creado correctamente';
+        this.toastType = 'success';
+        this.showToast = true;
 
-        this.mostrarToast('Candidato creado correctamente', 'success');
+        // Reset del formulario correctamente
+        this.candidatoFormComponent.resetForm();
+
+        // Forzar actualización UI (zoneless)
+        this.cdr.detectChanges();
       },
       error: () => {
-        this.mostrarToast('Error al crear candidato', 'error');
+        this.toastMessage = 'Error al crear candidato';
+        this.toastType = 'error';
+        this.showToast = true;
+
+        this.cdr.detectChanges();
       },
     });
   }
 
-  mostrarToast(mensaje: string, tipo: 'success' | 'error') {
-    this.showToast = false;
-    setTimeout(() => {
-      this.toastMessage = mensaje;
-      this.toastType = tipo;
-      this.showToast = true;
-    }, 0);
-  }
-  /**
-   * Cerrar toast
-   */
   onCloseToast() {
     this.showToast = false;
+    this.cdr.detectChanges();
   }
 }
