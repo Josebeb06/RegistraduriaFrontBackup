@@ -4,30 +4,28 @@
     <p>Designe ciudadanos como jurados de votación mediante sorteo aleatorio.</p>
   </div>
 
+  <!-- Selector de elección (compartido para form y sorteo) -->
+  <div class="page__eleccion">
+    <label>Seleccione la Elección</label>
+    <select [(ngModel)]="eleccionSorteoId">
+      <option [value]="null">Seleccione una elección</option>
+      <option *ngFor="let e of elecciones" [value]="e.idEleccion">
+        {{ e.nombre }}
+      </option>
+    </select>
+  </div>
+
   <div class="page__content">
-    <!-- Panel izquierdo: formulario -->
+    <!-- Panel izquierdo: formulario manual -->
     <div class="page__card">
-      <app-jurado-form
-        [elecciones]="elecciones"
-        [mesas]="mesas"
-        [empresas]="empresas"
-        (formSubmit)="onRegistrarJurado($event)"
-      ></app-jurado-form>
+      <app-jurado-form (formSubmit)="onRegistrarJurado($event)"></app-jurado-form>
     </div>
 
-    <!-- Panel derecho: sorteo aleatorio -->
+    <!-- Panel derecho: sorteo automático -->
     <div class="page__sorteo">
       <div class="sorteo__header">
         <h3>Sorteo Automático</h3>
-        <p>Seleccione una elección y ejecute el sorteo para asignar jurados aleatoriamente.</p>
-      </div>
-
-      <div class="sorteo__select">
-        <label>Elección para el sorteo</label>
-        <select [(ngModel)]="eleccionSorteoId">
-          <option value="">Seleccione una elección</option>
-          <option *ngFor="let e of elecciones" [value]="e.id">{{ e.nombre }}</option>
-        </select>
+        <p>Ejecute el sorteo para asignar jurados aleatoriamente a la elección seleccionada.</p>
       </div>
 
       <button
@@ -40,10 +38,11 @@
 
       <!-- Resultado del sorteo -->
       <div class="sorteo__resultado" *ngIf="resultadoSorteo.length > 0">
-        <h4>Jurados asignados</h4>
+        <h4>Jurados asignados ({{ resultadoSorteo.length }})</h4>
         <div class="sorteo__item" *ngFor="let j of resultadoSorteo">
-          <span class="sorteo__nombre">{{ j.nombres }} {{ j.apellidos }}</span>
-          <span class="sorteo__tipo">{{ j.juradoTipo }}</span>
+          <span class="sorteo__nombre">{{ j.nombreCiudadano }}</span>
+          <span class="sorteo__tipo">{{ j.tipoJurado }}</span>
+          <span class="sorteo__mesa">Mesa {{ j.numeroMesa }}</span>
         </div>
       </div>
     </div>

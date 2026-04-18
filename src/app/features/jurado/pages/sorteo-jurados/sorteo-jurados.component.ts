@@ -1,9 +1,14 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JuradoFormComponent } from '../../components/jurado-form/jurado-form.component';
 import { ToastComponent } from '../../../../shared/components/toast/toast.component';
-import { JuradoService } from '../../services/jurado.service';
+import {
+  JuradoService,
+  CreateEleccionJuradoDTO,
+  ResponseEleccionJuradoDTO,
+} from '../../services/jurado.service';
+import { EleccionService } from '../../../eleccion/services/eleccion.service';
 
 @Component({
   selector: 'app-sorteo-jurados',
@@ -13,44 +18,58 @@ import { JuradoService } from '../../services/jurado.service';
   styleUrls: ['./sorteo-jurados.component.scss'],
 })
 export class SorteoJuradosComponent implements OnInit {
-  private juradoService = inject(JuradoService);
+  // Elecciones del back para el select
+  elecciones: { idEleccion: number; nombre: string }[] = [];
 
-  // Datos para los selects del formulario
-  elecciones: { id: string; nombre: string }[] = [];
-  mesas: { id: string; numeroMesa: number }[] = [];
-  empresas: { id: string; nombre: string }[] = [];
+  // Elección seleccionada para el sorteo y para el form
+  eleccionSorteoId: number | null = null;
 
   // Sorteo
-  eleccionSorteoId = '';
   sorteando = false;
-  resultadoSorteo: { nombres: string; apellidos: string; juradoTipo: string }[] = [];
+  resultadoSorteo: ResponseEleccionJuradoDTO[] = [];
 
   // Toast
   showToast = false;
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
 
+  constructor(
+    private juradoService: JuradoService,
+    private eleccionService: EleccionService,
+  ) {}
+
   ngOnInit(): void {
-    // Temporal: datos mock hasta conectar con back
-    this.elecciones = [
-      { id: '1', nombre: 'Elecciones Presidenciales 2026' },
-      { id: '2', nombre: 'Elecciones Congreso 2026' },
-    ];
-    this.mesas = [
-      { id: '1', numeroMesa: 1 },
-      { id: '2', numeroMesa: 2 },
-    ];
-    this.empresas = [
-      { id: '1', nombre: 'Logística Nacional S.A.' },
-      { id: '2', nombre: 'Envíos Seguros Ltda.' },
-    ];
+    this.cargarElecciones();
+  }
+
+  cargarElecciones(): void {
+    this.eleccionService.obtenerElecciones().subscribe({
+      next: (data) => {
+        this.elecciones = data.map((e: any) => ({
+          idEleccion: e.idEleccion,
+          nombre: e.nombre,
+        }));
+      },
+      error: () => {
+        this.toastMessage = 'Error al cargar elecciones';
+        this.toastType = 'error';
+        this.showToast = true;
+      },
+    });
   }
 
   /**
-   * Registro manual de jurado
+   * Registro manual — idEleccion va en la URL
    */
-  onRegistrarJurado(data: any): void {
-    this.juradoService.crearJurado(data).subscribe({
+  onRegistrarJurado(data: CreateEleccionJuradoDTO): void {
+    if (!this.eleccionSorteoId) {
+      this.toastMessage = 'Seleccione una elección primero';
+      this.toastType = 'error';
+      this.showToast = true;
+      return;
+    }
+
+    this.juradoService.crearJurado(this.eleccionSorteoId, data).subscribe({
       next: () => {
         this.toastMessage = 'Jurado registrado correctamente';
         this.toastType = 'success';
@@ -65,7 +84,7 @@ export class SorteoJuradosComponent implements OnInit {
   }
 
   /**
-   * Sorteo automático de jurados
+   * Sorteo automático
    */
   onEjecutarSorteo(): void {
     if (!this.eleccionSorteoId) return;

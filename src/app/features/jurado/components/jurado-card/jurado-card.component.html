@@ -1,36 +1,26 @@
-<div class="card" [ngClass]="'card--' + jurado.juradoTipo.toLowerCase()">
-  <!-- Header de la card -->
+<div class="card" [ngClass]="'card--' + jurado.tipoJurado.toLowerCase()">
   <div class="card__header">
-    <span class="card__badge">{{ getTipoLabel(jurado.juradoTipo) }}</span>
+    <span class="card__badge">{{ getTipoLabel(jurado.tipoJurado) }}</span>
     <span
       class="card__estado"
-      [ngClass]="'card__estado--' + jurado.estadoCapacitacion.toLowerCase()"
+      [ngClass]="jurado.asignado ? 'card__estado--asignado' : 'card__estado--pendiente'"
     >
-      {{ getEstadoLabel(jurado.estadoCapacitacion) }}
+      {{ getAsignadoLabel(jurado.asignado) }}
     </span>
   </div>
 
-  <!-- Info principal -->
   <div class="card__body">
-    <h3 class="card__nombre">{{ jurado.nombres }} {{ jurado.apellidos }}</h3>
-    <p class="card__doc"><span class="card__label">Documento:</span> {{ jurado.numeroDoc }}</p>
-    <p class="card__mesa"><span class="card__label">Mesa:</span> {{ jurado.numeroMesa }}</p>
-    <p class="card__eleccion">
-      <span class="card__label">Elección:</span> {{ jurado.eleccionNombre }}
-    </p>
+    <h3 class="card__nombre">{{ jurado.nombreCiudadano }}</h3>
 
-    <!-- Solo si es domiciliario -->
-    <p class="card__empresa" *ngIf="jurado.juradoTipo === 'DOMICILIARIO'">
-      <span class="card__label">Empresa Logística:</span> {{ jurado.empresaNombre }}
-    </p>
-
-    <p class="card__fecha">
+    <p class="card__dato"><span class="card__label">Género:</span> {{ jurado.generoCiudadano }}</p>
+    <p class="card__dato"><span class="card__label">Elección:</span> {{ jurado.nombreEleccion }}</p>
+    <p class="card__dato"><span class="card__label">Mesa:</span> {{ jurado.numeroMesa }}</p>
+    <p class="card__dato">
       <span class="card__label">Capacitación:</span>
       {{ jurado.fechaCapacitacion | date: 'dd/MM/yyyy' }}
     </p>
   </div>
 
-  <!-- Acciones -->
   <div class="card__actions">
     <button class="card__btn card__btn--detail" (click)="onVerDetalle()">Ver Detalle</button>
     <button class="card__btn card__btn--danger" (click)="onEliminar()">Eliminar</button>

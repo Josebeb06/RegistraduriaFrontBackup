@@ -1,36 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ResponseEleccionJuradoDTO } from '../../services/jurado.service';
 
 /**
- * Interfaz del Jurado para la card
- * Pendiente ajustar con la respuesta real del back
- *
- * DTO BACKEND (JuradoResponseDTO):
- * {
- *   id: string (UUID),
- *   juradoTipo: 'PRESIDENTE' | 'SECRETARIO' | 'VOCAL' | 'DOMICILIARIO',
- *   nombres: string,
- *   apellidos: string,
- *   numeroDoc: string,
- *   numeroMesa: number,
- *   eleccionNombre: string,
- *   empresaNombre?: string,
- *   fechaCapacitacion: string (ISO date),
- *   estadoCapacitacion: 'PENDIENTE' | 'CAPACITADO' | 'NO_PRESENTADO'
- * }
+ * Componente: JuradoCard
+ * Muestra la información de un jurado usando el ResponseEleccionJuradoDTO real del back.
  */
-export interface JuradoCard {
-  id: string;
-  juradoTipo: 'PRESIDENTE' | 'SECRETARIO' | 'VOCAL' | 'DOMICILIARIO';
-  nombres: string;
-  apellidos: string;
-  numeroDoc: string;
-  numeroMesa: number;
-  eleccionNombre: string;
-  empresaNombre?: string;
-  fechaCapacitacion: string;
-  estadoCapacitacion: 'PENDIENTE' | 'CAPACITADO' | 'NO_PRESENTADO';
-}
+export type JuradoCard = ResponseEleccionJuradoDTO;
 
 @Component({
   selector: 'app-jurado-card',
@@ -40,16 +16,10 @@ export interface JuradoCard {
   styleUrls: ['./jurado-card.component.scss'],
 })
 export class JuradoCardComponent {
-  // Datos del jurado que llegan desde la page padre
   @Input() jurado!: JuradoCard;
+  @Output() verDetalle = new EventEmitter<number>();
+  @Output() eliminar = new EventEmitter<number>();
 
-  // Eventos hacia la page padre
-  @Output() verDetalle = new EventEmitter<string>();
-  @Output() eliminar = new EventEmitter<string>();
-
-  /**
-   * Label legible por tipo de jurado
-   */
   getTipoLabel(tipo: string): string {
     const labels: Record<string, string> = {
       PRESIDENTE: 'Presidente de Mesa',
@@ -60,29 +30,15 @@ export class JuradoCardComponent {
     return labels[tipo] ?? tipo;
   }
 
-  /**
-   * Label legible por estado de capacitación
-   */
-  getEstadoLabel(estado: string): string {
-    const labels: Record<string, string> = {
-      PENDIENTE: 'Pendiente',
-      CAPACITADO: 'Capacitado',
-      NO_PRESENTADO: 'No Presentado',
-    };
-    return labels[estado] ?? estado;
+  getAsignadoLabel(asignado: boolean): string {
+    return asignado ? 'Asignado' : 'Pendiente';
   }
 
-  /**
-   * Emite el id del jurado para ver detalle
-   */
   onVerDetalle(): void {
-    this.verDetalle.emit(this.jurado.id);
+    this.verDetalle.emit(this.jurado.idAsignacionJurado);
   }
 
-  /**
-   * Emite el id del jurado para eliminar
-   */
   onEliminar(): void {
-    this.eliminar.emit(this.jurado.id);
+    this.eliminar.emit(this.jurado.idAsignacionJurado);
   }
 }

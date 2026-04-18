@@ -5,8 +5,8 @@
   <div class="form__group">
     <label>Tipo de Jurado</label>
     <select
-      formControlName="juradoTipo"
-      [class.invalid]="juradoTipo?.invalid && juradoTipo?.touched"
+      formControlName="tipoJurado"
+      [class.invalid]="tipoJurado?.invalid && tipoJurado?.touched"
     >
       <option value="">Seleccione un tipo</option>
       <option value="PRESIDENTE">Presidente de Mesa</option>
@@ -14,58 +14,34 @@
       <option value="VOCAL">Vocal</option>
       <option value="DOMICILIARIO">Jurado Domiciliario</option>
     </select>
-    <small *ngIf="juradoTipo?.invalid && juradoTipo?.touched"> Tipo de jurado obligatorio </small>
+    <small *ngIf="tipoJurado?.invalid && tipoJurado?.touched"> Tipo de jurado obligatorio </small>
   </div>
 
-  <!-- Número de documento del ciudadano -->
+  <!-- Cédula del ciudadano -->
   <div class="form__group">
-    <label>Número de Documento del Ciudadano</label>
+    <label>Cédula del Ciudadano</label>
     <input
       type="text"
-      formControlName="numeroDoc"
+      formControlName="cedulaCiudadano"
       placeholder="Ej: 1234567890"
-      [class.invalid]="numeroDoc?.invalid && numeroDoc?.touched"
+      [class.invalid]="cedulaCiudadano?.invalid && cedulaCiudadano?.touched"
     />
-    <small *ngIf="numeroDoc?.invalid && numeroDoc?.touched">
-      Documento obligatorio (mínimo 6 dígitos)
+    <small *ngIf="cedulaCiudadano?.invalid && cedulaCiudadano?.touched">
+      Cédula obligatoria (mínimo 6 dígitos)
     </small>
   </div>
 
-  <!-- Elección asociada -->
+  <!-- Número de mesa -->
   <div class="form__group">
-    <label>Elección Asociada</label>
-    <select
-      formControlName="eleccionId"
-      [class.invalid]="eleccionId?.invalid && eleccionId?.touched"
-    >
-      <option value="">Seleccione una elección</option>
-      <option *ngFor="let e of elecciones" [value]="e.id">{{ e.nombre }}</option>
-    </select>
-    <small *ngIf="eleccionId?.invalid && eleccionId?.touched"> Elección obligatoria </small>
-  </div>
-
-  <!-- Mesa de votación -->
-  <div class="form__group">
-    <label>Mesa de Votación</label>
-    <select formControlName="mesaId" [class.invalid]="mesaId?.invalid && mesaId?.touched">
-      <option value="">Seleccione una mesa</option>
-      <option *ngFor="let m of mesas" [value]="m.id">Mesa {{ m.numeroMesa }}</option>
-    </select>
-    <small *ngIf="mesaId?.invalid && mesaId?.touched"> Mesa obligatoria </small>
-  </div>
-
-  <!-- Empresa logística (solo si es domiciliario) -->
-  <div class="form__group" *ngIf="juradoTipo?.value === 'DOMICILIARIO'">
-    <label>Empresa Logística</label>
-    <select
-      formControlName="empresaLogisticaId"
-      [class.invalid]="empresaLogisticaId?.invalid && empresaLogisticaId?.touched"
-    >
-      <option value="">Seleccione una empresa</option>
-      <option *ngFor="let emp of empresas" [value]="emp.id">{{ emp.nombre }}</option>
-    </select>
-    <small *ngIf="empresaLogisticaId?.invalid && empresaLogisticaId?.touched">
-      Empresa logística obligatoria para jurado domiciliario
+    <label>Número de Mesa</label>
+    <input
+      type="number"
+      formControlName="numeroMesa"
+      placeholder="Ej: 1"
+      [class.invalid]="numeroMesa?.invalid && numeroMesa?.touched"
+    />
+    <small *ngIf="numeroMesa?.invalid && numeroMesa?.touched">
+      Número de mesa obligatorio (mínimo 1)
     </small>
   </div>
 
@@ -82,6 +58,5 @@
     </small>
   </div>
 
-  <!-- Botón -->
   <button type="submit" class="form__button">Registrar Jurado</button>
 </form>

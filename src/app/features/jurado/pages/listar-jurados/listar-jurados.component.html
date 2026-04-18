@@ -2,7 +2,7 @@
   <div class="page__header">
     <div class="page__header-left">
       <h1>Jurados Registrados</h1>
-      <p>Consulte, filtre y gestione los jurados asignados al proceso electoral.</p>
+      <p>Consulte y filtre los jurados asignados al proceso electoral.</p>
     </div>
     <button class="page__btn-nuevo" routerLink="/jurado/sorteo">+ Registrar Jurado</button>
   </div>
@@ -17,22 +17,21 @@
       <option value="DOMICILIARIO">Domiciliario</option>
     </select>
 
-    <select [(ngModel)]="filtroEstado" (change)="onFiltrar()">
+    <select [(ngModel)]="filtroAsignado" (change)="onFiltrar()">
       <option value="">Todos los estados</option>
-      <option value="PENDIENTE">Pendiente</option>
-      <option value="CAPACITADO">Capacitado</option>
-      <option value="NO_PRESENTADO">No Presentado</option>
+      <option value="true">Asignado</option>
+      <option value="false">Pendiente</option>
     </select>
 
     <input
       type="text"
-      placeholder="Buscar por nombre o documento..."
+      placeholder="Buscar por nombre del ciudadano..."
       [(ngModel)]="filtroBusqueda"
       (input)="onFiltrar()"
     />
   </div>
 
-  <!-- Lista -->
+  <!-- Grid -->
   <div class="page__grid" *ngIf="juradosFiltrados.length > 0; else sinResultados">
     <app-jurado-card
       *ngFor="let jurado of juradosFiltrados"

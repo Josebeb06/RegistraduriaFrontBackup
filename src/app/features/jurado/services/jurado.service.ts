@@ -2,103 +2,90 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { JuradoCard } from '../components/jurado-card/jurado-card.component';
 
 /**
  * Servicio: JuradoService
  *
- * Responsabilidad:
- * - Conectar el frontend con la API REST del backend
- * - Manejar operaciones CRUD de jurados
- * - Manejar sorteo automático y actualización de capacitación
+ * Conecta el frontend con la API REST del backend para gestión de jurados.
  *
- * Backend Base URL:
- * http://10.43.100.131:8080/jurado
+ * Base URL: http://10.43.100.131:8080/eleccion-jurado
  *
- * 🔹 Endpoints pendientes de confirmar con back:
- * GET    /jurado/jurados                          → listar todos
- * POST   /jurado/add                              → crear jurado manual
- * DELETE /jurado/{id}                             → eliminar jurado
- * POST   /jurado/sorteo/{eleccionId}              → ejecutar sorteo
- * PATCH  /jurado/{id}/capacitacion/{estado}       → actualizar estado capacitación
+ * Endpoints reales (según api-docs.json):
+ * GET  /eleccion-jurado                              → listar todos
+ * GET  /eleccion-jurado/eleccion/{idEleccion}        → listar por elección
+ * POST /eleccion-jurado/eleccion/{idEleccion}        → crear jurado manual
+ * POST /eleccion-jurado/eleccion/{idEleccion}/sortear → ejecutar sorteo
  */
+
+export interface CreateEleccionJuradoDTO {
+  tipoJurado: string;
+  cedulaCiudadano: string;
+  numeroMesa: number;
+  fechaCapacitacion: string;
+}
+
+export interface ResponseEleccionJuradoDTO {
+  idAsignacionJurado: number;
+  nombreEleccion: string;
+  tipoJurado: string;
+  numeroMesa: number;
+  fechaCapacitacion: string;
+  asignado: boolean;
+  nombreCiudadano: string;
+  generoCiudadano: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class JuradoService {
-  private apiUrl = 'http://10.43.100.131:8080/jurado';
+  private apiUrl = 'http://10.43.100.131:8080/eleccion-jurado';
 
   constructor(private http: HttpClient) {}
 
   /**
-   * 🔹 Obtener todos los jurados
-   * GET /jurado/jurados
+   * Listar todos los jurados
+   * GET /eleccion-jurado
    */
-  getJurados(): Observable<JuradoCard[]> {
-    return this.http.get<JuradoCard[]>(`${this.apiUrl}/jurados`).pipe(catchError(this.handleError));
-  }
-
-  /**
-   * 🔹 Crear jurado manualmente
-   * POST /jurado/add
-   *
-   * Body (CreateJuradoDTO):
-   * {
-   *   juradoTipo: string,
-   *   numeroDoc: string,
-   *   eleccionId: string,
-   *   mesaId: string,
-   *   empresaLogisticaId?: string,
-   *   fechaCapacitacion: string
-   * }
-   */
-  crearJurado(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/add`, data).pipe(catchError(this.handleError));
-  }
-
-  /**
-   * 🔹 Eliminar jurado por ID
-   * DELETE /jurado/{id}
-   */
-  eliminarJurado(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`).pipe(catchError(this.handleError));
-  }
-
-  /**
-   * 🔹 Ejecutar sorteo automático de jurados para una elección
-   * POST /jurado/sorteo/{eleccionId}
-   *
-   * Response: lista de jurados asignados
-   * [{ nombres, apellidos, juradoTipo }]
-   */
-  ejecutarSorteo(
-    eleccionId: string,
-  ): Observable<{ nombres: string; apellidos: string; juradoTipo: string }[]> {
+  getJurados(): Observable<ResponseEleccionJuradoDTO[]> {
     return this.http
-      .post<
-        { nombres: string; apellidos: string; juradoTipo: string }[]
-      >(`${this.apiUrl}/sorteo/${eleccionId}`, {})
+      .get<ResponseEleccionJuradoDTO[]>(`${this.apiUrl}`)
       .pipe(catchError(this.handleError));
   }
 
   /**
-   * 🔹 Actualizar estado de capacitación de un jurado
-   * PATCH /jurado/{id}/capacitacion/{estado}
-   *
-   * estado: 'CAPACITADO' | 'NO_PRESENTADO' | 'PENDIENTE'
+   * Listar jurados de una elección específica
+   * GET /eleccion-jurado/eleccion/{idEleccion}
    */
-  actualizarEstadoCapacitacion(
-    id: string,
-    estado: 'CAPACITADO' | 'NO_PRESENTADO' | 'PENDIENTE',
-  ): Observable<any> {
+  getJuradosPorEleccion(idEleccion: number): Observable<ResponseEleccionJuradoDTO[]> {
     return this.http
-      .patch(`${this.apiUrl}/${id}/capacitacion/${estado}`, {})
+      .get<ResponseEleccionJuradoDTO[]>(`${this.apiUrl}/eleccion/${idEleccion}`)
       .pipe(catchError(this.handleError));
   }
 
   /**
-   * 🔹 Manejo centralizado de errores HTTP
+   * Crear jurado manualmente para una elección
+   * POST /eleccion-jurado/eleccion/{idEleccion}
    */
+  crearJurado(
+    idEleccion: number,
+    data: CreateEleccionJuradoDTO,
+  ): Observable<ResponseEleccionJuradoDTO> {
+    return this.http
+      .post<ResponseEleccionJuradoDTO>(`${this.apiUrl}/eleccion/${idEleccion}`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Ejecutar sorteo de jurados para una elección
+   * POST /eleccion-jurado/eleccion/{idEleccion}/sortear
+   */
+  ejecutarSorteo(idEleccion: number): Observable<ResponseEleccionJuradoDTO[]> {
+    return this.http
+      .post<ResponseEleccionJuradoDTO[]>(`${this.apiUrl}/eleccion/${idEleccion}/sortear`, {})
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
     console.error('Error en JuradoService:', error);
     return throwError(() => new Error('Error en la petición al servidor'));
