@@ -14,7 +14,6 @@ import { JuradoService, ResponseEleccionJuradoDTO } from '../../services/jurado.
   styleUrls: ['./listar-jurados.component.scss'],
 })
 export class ListarJuradosComponent implements OnInit {
-
   jurados: ResponseEleccionJuradoDTO[] = [];
   juradosFiltrados: ResponseEleccionJuradoDTO[] = [];
 
@@ -58,13 +57,9 @@ export class ListarJuradosComponent implements OnInit {
    */
   onFiltrar(): void {
     this.juradosFiltrados = this.jurados.filter((j) => {
-      const coincideTipo = this.filtroTipo
-        ? j.tipoJurado === this.filtroTipo
-        : true;
+      const coincideTipo = this.filtroTipo ? j.tipoJurado === this.filtroTipo : true;
 
-      const coincideEstado = this.filtroEstado
-      ? j.estado === this.filtroEstado
-      : true;
+      const coincideEstado = this.filtroEstado ? j.estado === this.filtroEstado : true;
 
       const coincideBusqueda = this.filtroBusqueda
         ? j.nombreCiudadano.toLowerCase().includes(this.filtroBusqueda.toLowerCase())
@@ -78,9 +73,7 @@ export class ListarJuradosComponent implements OnInit {
    * 🔹 Ver detalle abre modal con la info del jurado
    */
   onVerDetalle(id: number): void {
-    this.juradoSeleccionado = this.jurados.find(
-      (j) => j.idAsignacionJurado === id
-    ) ?? null;
+    this.juradoSeleccionado = this.jurados.find((j) => j.idAsignacionJurado === id) ?? null;
   }
 
   onCerrarDetalle(): void {
@@ -96,6 +89,15 @@ export class ListarJuradosComponent implements OnInit {
     this.toastMessage = 'Jurado eliminado';
     this.toastType = 'success';
     this.showToast = true;
+  }
+
+  getEstadoClass(estado: string): string {
+    const clases: Record<string, string> = {
+      CAPACITADO: 'badge--capacitado',
+      PENDIENTE: 'badge--pendiente',
+      NO_PRESENTADO: 'badge--no-presentado',
+    };
+    return clases[estado] ?? 'badge--pendiente';
   }
 
   onCloseToast(): void {

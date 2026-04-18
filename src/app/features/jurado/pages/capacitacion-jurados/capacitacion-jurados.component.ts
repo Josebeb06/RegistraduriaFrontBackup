@@ -2,7 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastComponent } from '../../../../shared/components/toast/toast.component';
-import { JuradoService, ResponseEleccionJuradoDTO, DashboardEleccionDTO } from '../../services/jurado.service';
+import {
+  JuradoService,
+  ResponseEleccionJuradoDTO,
+  DashboardEleccionDTO,
+} from '../../services/jurado.service';
 import { EleccionService } from '../../../eleccion/services/eleccion.service';
 
 @Component({
@@ -13,13 +17,17 @@ import { EleccionService } from '../../../eleccion/services/eleccion.service';
   styleUrls: ['./capacitacion-jurados.component.scss'],
 })
 export class CapacitacionJuradosComponent implements OnInit {
-
-  // 🔹 Elecciones para el selector de dashboard
+  // 🔹 Elecciones
   elecciones: { idEleccion: number; nombre: string }[] = [];
   eleccionSeleccionada: number | null = null;
-  dashboard: DashboardEleccionDTO | null = null;
 
-  // 🔹 Jurados de la elección seleccionada
+  // 🔹 Dashboard (stats)
+  dashboard: DashboardEleccionDTO | null = null;
+  totalJurados = 0;
+  totalAsignados = 0; // ahora son CAPACITADOS
+  totalPendientes = 0;
+
+  // 🔹 Jurados
   jurados: ResponseEleccionJuradoDTO[] = [];
 
   showToast = false;
@@ -55,18 +63,28 @@ export class CapacitacionJuradosComponent implements OnInit {
 
   cargarDashboard(): void {
     this.juradoService.getDashboard(this.eleccionSeleccionada!).subscribe({
-      next: (data) => { this.dashboard = data; },
+      next: (data) => {
+        this.dashboard = data;
+
+        // ✅ FIX: mapear correctamente
+        this.totalJurados = data.totalJurados;
+        this.totalAsignados = data.capacitados;
+        this.totalPendientes = data.pendientes;
+      },
       error: () => this.mostrarToast('Error al cargar dashboard', 'error'),
     });
   }
 
   cargarJurados(): void {
     this.juradoService.getJuradosPorEleccion(this.eleccionSeleccionada!).subscribe({
-      next: (data) => { this.jurados = data; },
+      next: (data) => {
+        this.jurados = data;
+      },
       error: () => this.mostrarToast('Error al cargar jurados', 'error'),
     });
   }
 
+  // ✅ NUEVO: usar estado en lugar de asignado
   getEstadoClass(estado: string): string {
     const clases: Record<string, string> = {
       CAPACITADO: 'badge--capacitado',

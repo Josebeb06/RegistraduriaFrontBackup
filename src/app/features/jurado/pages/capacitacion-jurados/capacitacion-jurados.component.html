@@ -10,10 +10,12 @@
       <span class="stat__numero">{{ totalJurados }}</span>
       <span class="stat__label">Total Jurados</span>
     </div>
-    <div class="stat stat--asignado">
+
+    <div class="stat stat--capacitado">
       <span class="stat__numero">{{ totalAsignados }}</span>
-      <span class="stat__label">Asignados</span>
+      <span class="stat__label">Capacitados</span>
     </div>
+
     <div class="stat stat--pendiente">
       <span class="stat__numero">{{ totalPendientes }}</span>
       <span class="stat__label">Pendientes</span>
@@ -45,11 +47,9 @@
           <td>{{ jurado.nombreEleccion }}</td>
           <td>{{ jurado.fechaCapacitacion | date: 'dd/MM/yyyy' }}</td>
           <td>
-            <span
-              class="badge"
-              [ngClass]="jurado.asignado ? 'badge--asignado' : 'badge--pendiente'"
-            >
-              {{ jurado.asignado ? 'Asignado' : 'Pendiente' }}
+            <!-- ✅ FIX COMPLETO -->
+            <span class="badge" [ngClass]="getEstadoClass(jurado.estado)">
+              {{ jurado.estado }}
             </span>
           </td>
         </tr>
