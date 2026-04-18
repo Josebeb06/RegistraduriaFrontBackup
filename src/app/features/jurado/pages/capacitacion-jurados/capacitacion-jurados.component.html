@@ -1,0 +1,85 @@
+<section class="page">
+  <div class="page__header">
+    <h1>Capacitación de Jurados</h1>
+    <p>Consulte el estado de asignación y capacitación de los jurados del proceso electoral.</p>
+  </div>
+
+  <!-- Selector de elección (FIX CLAVE) -->
+  <div class="page__filtros">
+    <label>Seleccione la Elección</label>
+    <select [(ngModel)]="eleccionSeleccionada" (change)="onSeleccionarEleccion()">
+      <option [ngValue]="null">Seleccione una elección</option>
+      <option *ngFor="let e of elecciones" [ngValue]="e.idEleccion">
+        {{ e.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Estadísticas (USANDO DASHBOARD REAL) -->
+  <div class="page__stats">
+    <div class="stat stat--total">
+      <span class="stat__numero">{{ dashboard?.totalJurados || 0 }}</span>
+      <span class="stat__label">Total Jurados</span>
+    </div>
+
+    <div class="stat stat--capacitado">
+      <span class="stat__numero">{{ dashboard?.capacitados || 0 }}</span>
+      <span class="stat__label">Capacitados</span>
+    </div>
+
+    <div class="stat stat--pendiente">
+      <span class="stat__numero">{{ dashboard?.pendientes || 0 }}</span>
+      <span class="stat__label">Pendientes</span>
+    </div>
+
+    <div class="stat stat--no-presentado">
+      <span class="stat__numero">{{ dashboard?.noPresentados || 0 }}</span>
+      <span class="stat__label">No Presentados</span>
+    </div>
+  </div>
+
+  <!-- 🔹 Tabla -->
+  <div class="page__tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Ciudadano</th>
+          <th>Género</th>
+          <th>Tipo</th>
+          <th>Mesa</th>
+          <th>Elección</th>
+          <th>Fecha Capacitación</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let jurado of jurados">
+          <td>{{ jurado.nombreCiudadano }}</td>
+          <td>{{ jurado.generoCiudadano }}</td>
+          <td>
+            <span class="badge badge--tipo">{{ jurado.tipoJurado }}</span>
+          </td>
+          <td>Mesa {{ jurado.numeroMesa }}</td>
+          <td>{{ jurado.nombreEleccion }}</td>
+          <td>{{ jurado.fechaCapacitacion | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="badge" [ngClass]="getEstadoClass(jurado.estado)">
+              {{ jurado.estado }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="page__empty" *ngIf="jurados.length === 0">
+      <p>No hay jurados registrados aún.</p>
+    </div>
+  </div>
+
+  <app-toast
+    *ngIf="showToast"
+    [message]="toastMessage"
+    [type]="toastType"
+    (close)="onCloseToast()"
+  ></app-toast>
+</section>

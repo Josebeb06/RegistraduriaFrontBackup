@@ -1,0 +1,60 @@
+<form [formGroup]="juradoForm" (ngSubmit)="onSubmit()" class="form">
+  <h2 class="form__title">Registro de Jurado</h2>
+
+  <!-- Tipo de Jurado -->
+  <div class="form__group">
+    <label>Tipo de Jurado</label>
+    <select
+  formControlName="tipoJurado"
+  [class.invalid]="tipoJurado?.invalid && tipoJurado?.touched"
+>
+  <option value="">Seleccione un tipo</option>
+  <option value="URNA">Jurado de Urna</option>
+  <option value="DOMICILIO">Jurado Domiciliario</option>
+</select>
+    <small *ngIf="tipoJurado?.invalid && tipoJurado?.touched"> Tipo de jurado obligatorio </small>
+  </div>
+
+  <!-- Cédula del ciudadano -->
+  <div class="form__group">
+    <label>Cédula del Ciudadano</label>
+    <input
+      type="text"
+      formControlName="cedulaCiudadano"
+      placeholder="Ej: 1234567890"
+      [class.invalid]="cedulaCiudadano?.invalid && cedulaCiudadano?.touched"
+    />
+    <small *ngIf="cedulaCiudadano?.invalid && cedulaCiudadano?.touched">
+      Cédula obligatoria (mínimo 6 dígitos)
+    </small>
+  </div>
+
+  <!-- Número de mesa -->
+  <div class="form__group">
+  <label>Número de Mesa</label>
+  <input
+    type="number"
+    formControlName="numeroMesa"
+    placeholder="Entre 1 y 32"
+    [class.invalid]="numeroMesa?.invalid && numeroMesa?.touched"
+  />
+  <small *ngIf="numeroMesa?.invalid && numeroMesa?.touched">
+    Número de mesa obligatorio (entre 1 y 32)
+  </small>
+</div>
+
+  <!-- Fecha de capacitación -->
+  <div class="form__group">
+    <label>Fecha de Capacitación</label>
+    <input
+      type="date"
+      formControlName="fechaCapacitacion"
+      [class.invalid]="fechaCapacitacion?.invalid && fechaCapacitacion?.touched"
+    />
+    <small *ngIf="fechaCapacitacion?.invalid && fechaCapacitacion?.touched">
+      Fecha de capacitación obligatoria
+    </small>
+  </div>
+
+  <button type="submit" class="form__button">Registrar Jurado</button>
+</form>

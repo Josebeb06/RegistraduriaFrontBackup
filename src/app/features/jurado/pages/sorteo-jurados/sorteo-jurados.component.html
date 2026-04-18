@@ -1,0 +1,57 @@
+<section class="page">
+  <div class="page__header">
+    <h1>Sorteo de Jurados</h1>
+    <p>Designe ciudadanos como jurados de votación mediante sorteo aleatorio.</p>
+  </div>
+
+  <!-- Selector de elección (compartido para form y sorteo) -->
+  <div class="page__eleccion">
+    <label>Seleccione la Elección</label>
+    <select [(ngModel)]="eleccionSorteoId">
+      <option [value]="null">Seleccione una elección</option>
+      <option *ngFor="let e of elecciones" [value]="e.idEleccion">
+        {{ e.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <div class="page__content">
+    <!-- Panel izquierdo: formulario manual -->
+    <div class="page__card">
+      <app-jurado-form (formSubmit)="onRegistrarJurado($event)"></app-jurado-form>
+    </div>
+
+    <!-- Panel derecho: sorteo automático -->
+    <div class="page__sorteo">
+      <div class="sorteo__header">
+        <h3>Sorteo Automático</h3>
+        <p>Ejecute el sorteo para asignar jurados aleatoriamente a la elección seleccionada.</p>
+      </div>
+
+      <button
+        class="sorteo__btn"
+        (click)="onEjecutarSorteo()"
+        [disabled]="!eleccionSorteoId || sorteando"
+      >
+        {{ sorteando ? 'Ejecutando sorteo...' : '🎲 Ejecutar Sorteo' }}
+      </button>
+
+      <!-- Resultado del sorteo -->
+      <div class="sorteo__resultado" *ngIf="resultadoSorteo.length > 0">
+        <h4>Jurados asignados ({{ resultadoSorteo.length }})</h4>
+        <div class="sorteo__item" *ngFor="let j of resultadoSorteo">
+          <span class="sorteo__nombre">{{ j.nombreCiudadano }}</span>
+          <span class="sorteo__tipo">{{ j.tipoJurado }}</span>
+          <span class="sorteo__mesa">Mesa {{ j.numeroMesa }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-toast
+    *ngIf="showToast"
+    [message]="toastMessage"
+    [type]="toastType"
+    (close)="onCloseToast()"
+  ></app-toast>
+</section>

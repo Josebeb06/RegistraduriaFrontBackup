@@ -1,0 +1,173 @@
+.page {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  padding: 2rem;
+
+  &__header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #c5a059;
+    padding-bottom: 0.5rem;
+
+    h1 {
+      color: #002d57;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__tabla {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+
+      thead tr {
+        background-color: #002d57;
+        color: #ffffff;
+
+        th {
+          padding: 0.8rem 1rem;
+          text-align: left;
+          font-weight: 600;
+        }
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #e5e7eb;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+          background-color: #f9fafb;
+        }
+
+        td {
+          padding: 0.8rem 1rem;
+          color: #374151;
+        }
+      }
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+  }
+}
+
+.stat {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-top: 4px solid #e5e7eb;
+
+  &__numero {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #002d57;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  &--total {
+    border-top-color: #002d57;
+  }
+  &--capacitado {
+    border-top-color: #10b981;
+  }
+  &--pendiente {
+    border-top-color: #f59e0b;
+  }
+  &--no-presentado {
+    border-top-color: #ef4444;
+  }
+}
+
+.badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+
+  &--tipo {
+    background-color: #e0e7ff;
+    color: #3730a3;
+  }
+
+  &--capacitado {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &--pendiente {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  &--no-presentado {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  padding: 0.4rem 0.7rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &--capacitar {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &--no-presentado {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+}
