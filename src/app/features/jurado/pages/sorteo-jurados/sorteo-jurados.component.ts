@@ -63,31 +63,23 @@ export class SorteoJuradosComponent implements OnInit {
    */
   onRegistrarJurado(data: CreateEleccionJuradoDTO): void {
     if (!this.eleccionSorteoId) {
-      this.toastMessage = 'Seleccione una elección primero';
-      this.toastType = 'error';
-      this.showToast = true;
+      this.mostrarToast('Seleccione una elección primero', 'error');
       return;
     }
 
     this.juradoService.crearJurado(this.eleccionSorteoId, data).subscribe({
       next: () => {
-        this.toastMessage = 'Jurado registrado correctamente';
-        this.toastType = 'success';
-        this.showToast = true;
+        this.mostrarToast('Jurado registrado correctamente', 'success');
       },
-      error: () => {
-        this.toastMessage = 'Error al registrar jurado';
-        this.toastType = 'error';
-        this.showToast = true;
+      error: (err) => {
+        this.mostrarToast(err.message || 'Error al registrar jurado', 'error');
       },
     });
   }
 
-  /**
-   * Sorteo automático
-   */
   onEjecutarSorteo(): void {
     if (!this.eleccionSorteoId) return;
+
     this.sorteando = true;
     this.resultadoSorteo = [];
 
@@ -95,17 +87,23 @@ export class SorteoJuradosComponent implements OnInit {
       next: (resultado) => {
         this.resultadoSorteo = resultado;
         this.sorteando = false;
-        this.toastMessage = 'Sorteo ejecutado correctamente';
-        this.toastType = 'success';
-        this.showToast = true;
+        this.mostrarToast('Sorteo ejecutado correctamente', 'success');
       },
-      error: () => {
+      error: (err) => {
         this.sorteando = false;
-        this.toastMessage = 'Error al ejecutar el sorteo';
-        this.toastType = 'error';
-        this.showToast = true;
+        this.mostrarToast(err.message || 'Error al ejecutar el sorteo', 'error');
       },
     });
+  }
+
+  /** ✅ FIX TOAST */
+  mostrarToast(mensaje: string, tipo: 'success' | 'error') {
+    this.showToast = false;
+    setTimeout(() => {
+      this.toastMessage = mensaje;
+      this.toastType = tipo;
+      this.showToast = true;
+    }, 0);
   }
 
   onCloseToast(): void {

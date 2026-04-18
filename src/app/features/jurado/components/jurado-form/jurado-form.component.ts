@@ -1,11 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CreateEleccionJuradoDTO } from '../../services/jurado.service';
 
 @Component({
@@ -16,7 +11,6 @@ import { CreateEleccionJuradoDTO } from '../../services/jurado.service';
   styleUrls: ['./jurado-form.component.scss'],
 })
 export class JuradoFormComponent implements OnInit {
-
   @Output() formSubmit = new EventEmitter<CreateEleccionJuradoDTO>();
 
   juradoForm!: FormGroup;
@@ -32,10 +26,18 @@ export class JuradoFormComponent implements OnInit {
     });
   }
 
-  get tipoJurado() { return this.juradoForm.get('tipoJurado'); }
-  get cedulaCiudadano() { return this.juradoForm.get('cedulaCiudadano'); }
-  get numeroMesa() { return this.juradoForm.get('numeroMesa'); }
-  get fechaCapacitacion() { return this.juradoForm.get('fechaCapacitacion'); }
+  get tipoJurado() {
+    return this.juradoForm.get('tipoJurado');
+  }
+  get cedulaCiudadano() {
+    return this.juradoForm.get('cedulaCiudadano');
+  }
+  get numeroMesa() {
+    return this.juradoForm.get('numeroMesa');
+  }
+  get fechaCapacitacion() {
+    return this.juradoForm.get('fechaCapacitacion');
+  }
 
   onSubmit(): void {
     if (this.juradoForm.invalid) {
@@ -45,15 +47,24 @@ export class JuradoFormComponent implements OnInit {
 
     const formValue = this.juradoForm.value;
 
-    // 🔹 FIX: el back espera LocalDateTime, no solo fecha
-    // Convierte "2026-05-01" → "2026-05-01T08:00:00"
-    const fechaConHora = `${formValue.fechaCapacitacion}T08:00:00`;
+    // ✅ FIX REAL: crear LocalDateTime válido SIN zona UTC
+    const fecha = new Date(formValue.fechaCapacitacion);
+    fecha.setHours(8, 0, 0);
+
+    const yyyy = fecha.getFullYear();
+    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dd = String(fecha.getDate()).padStart(2, '0');
+    const hh = String(fecha.getHours()).padStart(2, '0');
+    const min = String(fecha.getMinutes()).padStart(2, '0');
+    const ss = String(fecha.getSeconds()).padStart(2, '0');
+
+    const fechaFormateada = `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}`;
 
     const dto: CreateEleccionJuradoDTO = {
       tipoJurado: formValue.tipoJurado,
       cedulaCiudadano: formValue.cedulaCiudadano,
       numeroMesa: Number(formValue.numeroMesa),
-      fechaCapacitacion: fechaConHora,
+      fechaCapacitacion: fechaFormateada,
     };
 
     this.formSubmit.emit(dto);

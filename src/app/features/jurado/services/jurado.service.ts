@@ -16,7 +16,7 @@ export interface ResponseEleccionJuradoDTO {
   tipoJurado: string;
   numeroMesa: number;
   fechaCapacitacion: string;
-  estado: string;           // 🔹 Cambió: era asignado:boolean, ahora es estado:string
+  estado: string; // 🔹 Cambió: era asignado:boolean, ahora es estado:string
   nombreCiudadano: string;
   generoCiudadano: string;
 }
@@ -34,7 +34,6 @@ export interface DashboardEleccionDTO {
   providedIn: 'root',
 })
 export class JuradoService {
-
   private apiUrl = 'http://10.43.100.131:8080/eleccion-jurado';
 
   constructor(private http: HttpClient) {}
@@ -51,7 +50,10 @@ export class JuradoService {
       .pipe(catchError(this.handleError));
   }
 
-  crearJurado(idEleccion: number, data: CreateEleccionJuradoDTO): Observable<ResponseEleccionJuradoDTO> {
+  crearJurado(
+    idEleccion: number,
+    data: CreateEleccionJuradoDTO,
+  ): Observable<ResponseEleccionJuradoDTO> {
     return this.http
       .post<ResponseEleccionJuradoDTO>(`${this.apiUrl}/eleccion/${idEleccion}`, data)
       .pipe(catchError(this.handleError));
@@ -75,6 +77,17 @@ export class JuradoService {
 
   private handleError(error: HttpErrorResponse) {
     console.error('Error en JuradoService:', error);
+
+    let mensaje = 'Error en la petición al servidor';
+
+    if (error.status === 404) {
+      mensaje = 'Ciudadano o elección no encontrada';
+    } else if (error.status === 409) {
+      mensaje = 'El ciudadano ya está asignado como jurado';
+    } else if (error.status === 400) {
+      mensaje = 'Datos inválidos en el formulario';
+    }
+
     return throwError(() => new Error('Error en la petición al servidor'));
   }
 }
