@@ -5,15 +5,13 @@
   <div class="form__group">
     <label>Tipo de Jurado</label>
     <select
-      formControlName="tipoJurado"
-      [class.invalid]="tipoJurado?.invalid && tipoJurado?.touched"
-    >
-      <option value="">Seleccione un tipo</option>
-      <option value="PRESIDENTE">Presidente de Mesa</option>
-      <option value="SECRETARIO">Secretario de Mesa</option>
-      <option value="VOCAL">Vocal</option>
-      <option value="DOMICILIARIO">Jurado Domiciliario</option>
-    </select>
+  formControlName="tipoJurado"
+  [class.invalid]="tipoJurado?.invalid && tipoJurado?.touched"
+>
+  <option value="">Seleccione un tipo</option>
+  <option value="URNA">Jurado de Urna</option>
+  <option value="DOMICILIO">Jurado Domiciliario</option>
+</select>
     <small *ngIf="tipoJurado?.invalid && tipoJurado?.touched"> Tipo de jurado obligatorio </small>
   </div>
 
@@ -33,17 +31,17 @@
 
   <!-- Número de mesa -->
   <div class="form__group">
-    <label>Número de Mesa</label>
-    <input
-      type="number"
-      formControlName="numeroMesa"
-      placeholder="Ej: 1"
-      [class.invalid]="numeroMesa?.invalid && numeroMesa?.touched"
-    />
-    <small *ngIf="numeroMesa?.invalid && numeroMesa?.touched">
-      Número de mesa obligatorio (mínimo 1)
-    </small>
-  </div>
+  <label>Número de Mesa</label>
+  <input
+    type="number"
+    formControlName="numeroMesa"
+    placeholder="Entre 1 y 32"
+    [class.invalid]="numeroMesa?.invalid && numeroMesa?.touched"
+  />
+  <small *ngIf="numeroMesa?.invalid && numeroMesa?.touched">
+    Número de mesa obligatorio (entre 1 y 32)
+  </small>
+</div>
 
   <!-- Fecha de capacitación -->
   <div class="form__group">

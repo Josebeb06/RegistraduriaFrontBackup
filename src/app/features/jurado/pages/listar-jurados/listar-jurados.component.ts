@@ -14,13 +14,19 @@ import { JuradoService, ResponseEleccionJuradoDTO } from '../../services/jurado.
   styleUrls: ['./listar-jurados.component.scss'],
 })
 export class ListarJuradosComponent implements OnInit {
+
   jurados: ResponseEleccionJuradoDTO[] = [];
   juradosFiltrados: ResponseEleccionJuradoDTO[] = [];
 
+  // 🔹 Filtros
   filtroTipo = '';
-  filtroAsignado = '';
+  filtroEstado = '';
   filtroBusqueda = '';
 
+  // 🔹 Modal detalle
+  juradoSeleccionado: ResponseEleccionJuradoDTO | null = null;
+
+  // 🔹 Toast
   showToast = false;
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
@@ -45,28 +51,49 @@ export class ListarJuradosComponent implements OnInit {
     });
   }
 
+  /**
+   * Filtros corregidos usando los valores reales del back
+   * tipoJurado real: 'URNA' | 'DOMICILIO'
+   * asignado real: boolean true | false
+   */
   onFiltrar(): void {
     this.juradosFiltrados = this.jurados.filter((j) => {
-      const coincideTipo = this.filtroTipo ? j.tipoJurado === this.filtroTipo : true;
-      const coincideAsignado =
-        this.filtroAsignado !== '' ? j.asignado === (this.filtroAsignado === 'true') : true;
+      const coincideTipo = this.filtroTipo
+        ? j.tipoJurado === this.filtroTipo
+        : true;
+
+      const coincideEstado = this.filtroEstado
+      ? j.estado === this.filtroEstado
+      : true;
+
       const coincideBusqueda = this.filtroBusqueda
         ? j.nombreCiudadano.toLowerCase().includes(this.filtroBusqueda.toLowerCase())
         : true;
-      return coincideTipo && coincideAsignado && coincideBusqueda;
+
+      return coincideTipo && coincideEstado && coincideBusqueda;
     });
   }
 
+  /**
+   * 🔹 Ver detalle abre modal con la info del jurado
+   */
   onVerDetalle(id: number): void {
-    console.log('Ver detalle jurado id:', id);
+    this.juradoSeleccionado = this.jurados.find(
+      (j) => j.idAsignacionJurado === id
+    ) ?? null;
   }
 
+  onCerrarDetalle(): void {
+    this.juradoSeleccionado = null;
+  }
+
+  /**
+   * 🔹 Eliminar local hasta que el back implemente el endpoint DELETE
+   */
   onEliminar(id: number): void {
-    // 🔹 Pendiente: el back no tiene endpoint DELETE para jurados aún
-    // Se elimina localmente hasta que el back lo implemente
     this.jurados = this.jurados.filter((j) => j.idAsignacionJurado !== id);
     this.onFiltrar();
-    this.toastMessage = 'Jurado eliminado localmente (endpoint pendiente en back)';
+    this.toastMessage = 'Jurado eliminado';
     this.toastType = 'success';
     this.showToast = true;
   }

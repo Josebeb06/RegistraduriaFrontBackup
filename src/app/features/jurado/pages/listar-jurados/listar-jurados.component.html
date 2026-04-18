@@ -4,24 +4,25 @@
       <h1>Jurados Registrados</h1>
       <p>Consulte y filtre los jurados asignados al proceso electoral.</p>
     </div>
-    <button class="page__btn-nuevo" routerLink="/jurado/sorteo">+ Registrar Jurado</button>
+    <button class="page__btn-nuevo" routerLink="/jurado/sorteo">
+      + Registrar Jurado
+    </button>
   </div>
 
   <!-- Filtros -->
   <div class="page__filtros">
     <select [(ngModel)]="filtroTipo" (change)="onFiltrar()">
       <option value="">Todos los tipos</option>
-      <option value="PRESIDENTE">Presidente</option>
-      <option value="SECRETARIO">Secretario</option>
-      <option value="VOCAL">Vocal</option>
-      <option value="DOMICILIARIO">Domiciliario</option>
+      <option value="URNA">Urna</option>
+      <option value="DOMICILIO">Domicilio</option>
     </select>
 
-    <select [(ngModel)]="filtroAsignado" (change)="onFiltrar()">
-      <option value="">Todos los estados</option>
-      <option value="true">Asignado</option>
-      <option value="false">Pendiente</option>
-    </select>
+    <select [(ngModel)]="filtroEstado" (change)="onFiltrar()">
+  <option value="">Todos los estados</option>
+  <option value="CAPACITADO">Capacitado</option>
+  <option value="PENDIENTE">Pendiente</option>
+  <option value="NO_PRESENTADO">No Presentado</option>
+</select>
 
     <input
       type="text"
@@ -46,6 +47,30 @@
       <p>No se encontraron jurados con los filtros seleccionados.</p>
     </div>
   </ng-template>
+
+  <!-- Modal detalle -->
+  <div class="modal" *ngIf="juradoSeleccionado">
+    <div class="modal__backdrop" (click)="onCerrarDetalle()"></div>
+    <div class="modal__box">
+      <div class="modal__header">
+        <h3>Detalle del Jurado</h3>
+        <button class="modal__close" (click)="onCerrarDetalle()">✕</button>
+      </div>
+      <div class="modal__body">
+        <p><span class="modal__label">Ciudadano:</span> {{ juradoSeleccionado.nombreCiudadano }}</p>
+        <p><span class="modal__label">Género:</span> {{ juradoSeleccionado.generoCiudadano }}</p>
+        <p><span class="modal__label">Tipo:</span> {{ juradoSeleccionado.tipoJurado }}</p>
+        <p><span class="modal__label">Elección:</span> {{ juradoSeleccionado.nombreEleccion }}</p>
+        <p><span class="modal__label">Mesa:</span> {{ juradoSeleccionado.numeroMesa }}</p>
+        <p><span class="modal__label">Capacitación:</span> {{ juradoSeleccionado.fechaCapacitacion | date: 'dd/MM/yyyy' }}</p>
+        <p><span class="modal__label">Estado:</span>
+          <span [ngClass]="juradoSeleccionado.asignado ? 'badge--asignado' : 'badge--pendiente'">
+            {{ juradoSeleccionado.asignado ? 'Asignado' : 'Pendiente' }}
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
 
   <app-toast
     *ngIf="showToast"

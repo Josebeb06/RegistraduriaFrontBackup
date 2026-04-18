@@ -1,20 +1,23 @@
 <div class="card" [ngClass]="'card--' + jurado.tipoJurado.toLowerCase()">
+
   <div class="card__header">
     <span class="card__badge">{{ getTipoLabel(jurado.tipoJurado) }}</span>
-    <span
-      class="card__estado"
-      [ngClass]="jurado.asignado ? 'card__estado--asignado' : 'card__estado--pendiente'"
-    >
-      {{ getAsignadoLabel(jurado.asignado) }}
+    <span class="card__estado" [ngClass]="getEstadoClass(jurado.estado)">
+      {{ jurado.estado }}
     </span>
   </div>
 
   <div class="card__body">
     <h3 class="card__nombre">{{ jurado.nombreCiudadano }}</h3>
-
-    <p class="card__dato"><span class="card__label">Género:</span> {{ jurado.generoCiudadano }}</p>
-    <p class="card__dato"><span class="card__label">Elección:</span> {{ jurado.nombreEleccion }}</p>
-    <p class="card__dato"><span class="card__label">Mesa:</span> {{ jurado.numeroMesa }}</p>
+    <p class="card__dato">
+      <span class="card__label">Género:</span> {{ jurado.generoCiudadano }}
+    </p>
+    <p class="card__dato">
+      <span class="card__label">Elección:</span> {{ jurado.nombreEleccion }}
+    </p>
+    <p class="card__dato">
+      <span class="card__label">Mesa:</span> {{ jurado.numeroMesa }}
+    </p>
     <p class="card__dato">
       <span class="card__label">Capacitación:</span>
       {{ jurado.fechaCapacitacion | date: 'dd/MM/yyyy' }}
@@ -22,7 +25,12 @@
   </div>
 
   <div class="card__actions">
-    <button class="card__btn card__btn--detail" (click)="onVerDetalle()">Ver Detalle</button>
-    <button class="card__btn card__btn--danger" (click)="onEliminar()">Eliminar</button>
+    <button class="card__btn card__btn--detail" (click)="onVerDetalle()">
+      Ver Detalle
+    </button>
+    <button class="card__btn card__btn--danger" (click)="onEliminar()">
+      Eliminar
+    </button>
   </div>
+
 </div>
