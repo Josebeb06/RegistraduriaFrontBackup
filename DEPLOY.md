@@ -285,3 +285,94 @@ cd ~/Vote4TechRegistraduriaFront
 docker compose -f docker/docker-compose.prod.yml down
 docker compose -f docker/docker-compose.prod.yml up -d --build
 ```
+
+---
+
+## Ambiente QA
+
+El ambiente de QA usa máquinas distintas a producción. Los pasos son los mismos, pero con las siguientes IPs:
+
+| Componente   | VM Producción       | VM QA               | Puerto |
+|--------------|---------------------|---------------------|--------|
+| Frontend     | `10.43.97.237`      | `10.43.97.232`      | `80`   |
+| Backend      | `10.43.100.131`     | `10.43.99.3`        | `8080` |
+| Base de datos| `10.43.101.13`      | `10.43.98.254`      | `5432` |
+
+### Qué cambiar en el VM Backend QA (`10.43.99.3`)
+
+Editar `application.properties` con las IPs de QA:
+
+```bash
+nano ~/Vote4TechRegistraduriaBack/src/main/resources/application.properties
+```
+
+```properties
+spring.application.name=PortalRegistraduriaBack
+server.port=8080
+spring.datasource.url=jdbc:postgresql://10.43.98.254:5432/bd_nacional_vote4tech
+spring.datasource.username=admin_db_nacional
+spring.datasource.password=12345
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+config.cors.allowed-origins=https://<CLOUDFLARE_URL>.trycloudflare.com,http://10.43.97.232
+logging.level.org.springframework=INFO
+```
+
+Diferencias respecto a producción:
+- `spring.datasource.url` apunta a `10.43.98.254` en lugar de `10.43.101.13`
+- `config.cors.allowed-origins` incluye `10.43.97.232` en lugar de `10.43.97.237`
+
+Luego arrancar normalmente:
+
+```bash
+cd ~/Vote4TechRegistraduriaBack
+mvn spring-boot:run 2>&1 | tee /tmp/log.txt
+```
+
+### Qué cambiar en el VM Frontend QA (`10.43.97.232`)
+
+El `nginx.conf` tiene hardcodeada la IP del backend. Hay que editarlo antes de construir el contenedor:
+
+```bash
+nano ~/Vote4TechRegistraduriaFront/docker/nginx.conf
+```
+
+Cambiar la línea `proxy_pass` de:
+
+```nginx
+proxy_pass http://10.43.100.131:8080/;
+```
+
+a:
+
+```nginx
+proxy_pass http://10.43.99.3:8080/;
+```
+
+Guardar y luego levantar los contenedores:
+
+```bash
+cd ~/Vote4TechRegistraduriaFront
+docker compose -f docker/docker-compose.prod.yml up -d --build
+```
+
+> El `--build` es obligatorio para que Nginx tome el nuevo `nginx.conf`.
+
+Obtener el URL de Cloudflare:
+
+```bash
+docker logs $(docker ps -q --filter name=cloudflared) 2>&1 | grep trycloudflare
+```
+
+Actualizar ese URL en el `application.properties` del backend QA y reiniciar el backend.
+
+### Verificar QA
+
+Desde el VM frontend QA:
+
+```bash
+curl http://localhost/api/eleccion/elecciones
+```
+
+Debe devolver JSON. Si devuelve un error de conexión, verificar que el backend en `10.43.99.3:8080` está corriendo.
