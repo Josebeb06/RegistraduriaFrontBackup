@@ -27,20 +27,22 @@ export class CrearCandidatoComponent {
       next: (response) => {
         console.log('Candidato creado:', response);
 
-        this.toastMessage = 'Candidato creado correctamente';
-        this.toastType = 'success';
-        this.showToast = true;
+        this.mostrarToast('Candidato creado correctamente', 'success');
       },
-      error: (err) => {
-        console.error('Error:', err);
-
-        this.toastMessage = 'Error al crear candidato';
-        this.toastType = 'error';
-        this.showToast = true;
+      error: () => {
+        this.mostrarToast('Error al crear candidato', 'error');
       },
     });
   }
 
+  mostrarToast(mensaje: string, tipo: 'success' | 'error') {
+    this.showToast = false;
+    setTimeout(() => {
+      this.toastMessage = mensaje;
+      this.toastType = tipo;
+      this.showToast = true;
+    }, 0);
+  }
   /**
    * Cerrar toast
    */

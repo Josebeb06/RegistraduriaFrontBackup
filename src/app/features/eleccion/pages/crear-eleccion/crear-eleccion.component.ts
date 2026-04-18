@@ -24,21 +24,22 @@ export class CrearEleccionComponent {
    */
   onCrearEleccion(data: any) {
     this.eleccionService.crearEleccion(data).subscribe({
-      next: (response) => {
-        console.log('Elección creada:', response);
-
-        this.toastMessage = 'Elección creada correctamente';
-        this.toastType = 'success';
-        this.showToast = true;
+      next: () => {
+        this.mostrarToast('Elección creada correctamente', 'success');
       },
-      error: (error) => {
-        console.error('Error:', error);
-
-        this.toastMessage = 'Error al crear la elección';
-        this.toastType = 'error';
-        this.showToast = true;
+      error: () => {
+        this.mostrarToast('Error al crear la elección', 'error');
       },
     });
+  }
+
+  mostrarToast(mensaje: string, tipo: 'success' | 'error') {
+    this.showToast = false;
+    setTimeout(() => {
+      this.toastMessage = mensaje;
+      this.toastType = tipo;
+      this.showToast = true;
+    }, 0);
   }
 
   /**
