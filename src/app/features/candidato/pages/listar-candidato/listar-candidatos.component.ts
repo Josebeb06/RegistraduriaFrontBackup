@@ -26,24 +26,29 @@ export class ListarCandidatosComponent implements OnInit {
   obtenerCandidatos() {
     this.loading = true;
 
+    this.cdr.detectChanges();
+
     this.candidatoService.getCandidatos().subscribe({
       next: (data) => {
         console.log('Candidatos:', data);
 
-        this.candidatos = [...data];
+        queueMicrotask(() => {
+          this.candidatos = [...data];
+          this.loading = false;
 
-        this.loading = false;
-
-        // FORZAR RENDER
-        this.cdr.detectChanges();
+          this.cdr.detectChanges();
+        });
       },
 
       error: (err) => {
-        console.error('Error:', err);
-        this.error = true;
-        this.loading = false;
+        console.error(err);
 
-        this.cdr.detectChanges();
+        queueMicrotask(() => {
+          this.error = true;
+          this.loading = false;
+
+          this.cdr.detectChanges();
+        });
       },
     });
   }
