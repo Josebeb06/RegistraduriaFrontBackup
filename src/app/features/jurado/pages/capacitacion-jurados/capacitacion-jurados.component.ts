@@ -44,11 +44,12 @@ export class CapacitacionJuradosComponent implements OnInit {
           nombre: e.nombre,
         }));
 
-        // BONUS UX: selecciona automáticamente la primera elección
-        if (this.elecciones.length > 0) {
-          this.eleccionSeleccionada = this.elecciones[0].idEleccion;
-          this.onSeleccionarEleccion();
-        }
+        setTimeout(() => {
+          if (this.elecciones.length > 0) {
+            this.eleccionSeleccionada = this.elecciones[0].idEleccion;
+            this.onSeleccionarEleccion();
+          }
+        }, 0); //FIX detección Angular
       },
       error: () => this.mostrarToast('Error al cargar elecciones', 'error'),
     });

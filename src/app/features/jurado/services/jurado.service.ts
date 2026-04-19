@@ -16,7 +16,7 @@ export interface ResponseEleccionJuradoDTO {
   tipoJurado: string;
   numeroMesa: number;
   fechaCapacitacion: string;
-  estado: string; // 🔹 Cambió: era asignado:boolean, ahora es estado:string
+  estado: string;
   nombreCiudadano: string;
   generoCiudadano: string;
 }

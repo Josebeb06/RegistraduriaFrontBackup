@@ -35,11 +35,11 @@ export class ListarCandidatosComponent implements OnInit {
    */
   obtenerCandidatos() {
     this.loading = true;
+    this.error = false;
 
     this.candidatoService.getCandidatos().subscribe({
       next: (data) => {
-        console.log('Candidatos:', data);
-        this.candidatos = data;
+        this.candidatos = [...data]; // rompe referencia (fix Angular change detection)
         this.loading = false;
       },
       error: (err) => {
