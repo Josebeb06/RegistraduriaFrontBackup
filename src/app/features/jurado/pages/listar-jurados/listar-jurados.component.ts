@@ -34,10 +34,13 @@ export class ListarJuradosComponent implements OnInit {
   }
 
   cargarJurados(): void {
+    this.jurados = [];
+    this.juradosFiltrados = [];
+
     this.juradoService.getJurados().subscribe({
       next: (data) => {
-        this.jurados = data;
-        this.juradosFiltrados = data;
+        this.jurados = [...data]; // FIX change detection
+        this.juradosFiltrados = [...data];
       },
       error: () => {
         this.toastMessage = 'Error al cargar jurados';

@@ -1,14 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CandidatoService } from '../../service/candidato.service';
 
-/**
- * Página: Listar Candidatos
- *
- * Responsabilidad:
- * - Consumir el backend
- * - Mostrar lista de candidatos
- */
 @Component({
   selector: 'app-listar-candidatos',
   standalone: true,
@@ -21,31 +14,42 @@ export class ListarCandidatosComponent implements OnInit {
   loading = true;
   error = false;
 
-  constructor(private candidatoService: CandidatoService) {}
+  constructor(
+    private candidatoService: CandidatoService,
+    private cdr: ChangeDetectorRef,
+  ) {console.log('Componentes de listar candidatos cargados');}
 
-  /**
-   * Al cargar la página → llamar backend
-   */
   ngOnInit(): void {
+    console.log('ngOnInit de ListarCandidatosComponent llamado - version nueva');
     this.obtenerCandidatos();
   }
 
-  /**
-   * Consumir API
-   */
   obtenerCandidatos() {
     this.loading = true;
+
+    this.cdr.detectChanges();
 
     this.candidatoService.getCandidatos().subscribe({
       next: (data) => {
         console.log('Candidatos:', data);
-        this.candidatos = data;
-        this.loading = false;
+
+        queueMicrotask(() => {
+          this.candidatos = [...data];
+          this.loading = false;
+
+          this.cdr.detectChanges();
+        });
       },
+
       error: (err) => {
-        console.error('Error:', err);
-        this.error = true;
-        this.loading = false;
+        console.error(err);
+
+        queueMicrotask(() => {
+          this.error = true;
+          this.loading = false;
+
+          this.cdr.detectChanges();
+        });
       },
     });
   }
