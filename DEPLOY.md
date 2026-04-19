@@ -288,6 +288,62 @@ docker compose -f docker/docker-compose.prod.yml up -d --build
 
 ---
 
+## Actualizar el Despliegue con Nuevos Cambios de Código
+
+Los cambios guardados localmente **no se reflejan automáticamente** en el despliegue. Hay que subir el código y aplicar los cambios manualmente.
+
+### Actualizar el Frontend
+
+Conectarse al VM del frontend (`10.43.97.237`) y ejecutar:
+
+**Opción A — si el repositorio está en git:**
+```bash
+cd ~/Vote4TechRegistraduriaFront
+git pull
+docker compose -f docker/docker-compose.prod.yml up -d --build
+```
+
+**Opción B — si se sube el código manualmente (desde PowerShell local):**
+```powershell
+robocopy "C:\ruta\al\Vote4TechRegistraduriaFront" "$env:TEMP\vote4tech-front-deploy" /E /XD node_modules .angular
+scp -r "$env:TEMP\vote4tech-front-deploy" estudiante@10.43.97.237:~/Vote4TechRegistraduriaFront
+```
+Luego en el VM:
+```bash
+cd ~/Vote4TechRegistraduriaFront
+docker compose -f docker/docker-compose.prod.yml up -d --build
+```
+
+> **Importante:** el flag `--build` es obligatorio. Sin él, Docker usa la imagen anterior cacheada y los cambios no se aplican.
+
+### Actualizar el Backend
+
+Conectarse al VM del backend (`10.43.100.131`) y ejecutar:
+
+**Opción A — si el repositorio está en git:**
+```bash
+cd ~/Vote4TechRegistraduriaBack
+git pull
+```
+
+**Opción B — si se sube el código manualmente (desde PowerShell local):**
+```powershell
+robocopy "C:\ruta\al\Vote4TechRegistraduriaBack" "$env:TEMP\vote4tech-back-deploy" /E /XD target
+scp -r "$env:TEMP\vote4tech-back-deploy" estudiante@10.43.100.131:~/Vote4TechRegistraduriaBack
+```
+
+Luego detener el proceso actual y reiniciar Maven (que recompila automáticamente al arrancar):
+
+```bash
+# Si está corriendo en tmux:
+tmux attach -t backend
+# Ctrl+C para detener, luego:
+cd ~/Vote4TechRegistraduriaBack
+mvn spring-boot:run 2>&1 | tee /tmp/log.txt
+```
+
+---
+
 ## Ambiente QA
 
 El ambiente de QA usa máquinas distintas a producción. Los pasos son los mismos, pero con las siguientes IPs:
