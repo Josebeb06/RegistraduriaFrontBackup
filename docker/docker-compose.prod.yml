@@ -14,8 +14,8 @@ services:
       dockerfile: Dockerfile
     image: vote4tech-front:latest
     container_name: vote4tech-front
-    ports:
-      - "80:80"            # acceso local dentro de la VM (lo usa cloudflared)
+    network_mode: host     # usa la red del VM directamente; permite que Nginx
+                           # alcance IPs externas igual que el host (ej: 10.43.100.131)
     restart: unless-stopped
 
   cloudflared:
