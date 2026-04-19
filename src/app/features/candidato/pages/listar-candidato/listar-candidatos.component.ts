@@ -1,14 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CandidatoService } from '../../service/candidato.service';
 
-/**
- * Página: Listar Candidatos
- *
- * Responsabilidad:
- * - Consumir el backend
- * - Mostrar lista de candidatos
- */
 @Component({
   selector: 'app-listar-candidatos',
   standalone: true,
@@ -21,31 +14,36 @@ export class ListarCandidatosComponent implements OnInit {
   loading = true;
   error = false;
 
-  constructor(private candidatoService: CandidatoService) {}
+  constructor(
+    private candidatoService: CandidatoService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
-  /**
-   * Al cargar la página → llamar backend
-   */
   ngOnInit(): void {
     this.obtenerCandidatos();
   }
 
-  /**
-   * Consumir API
-   */
   obtenerCandidatos() {
     this.loading = true;
-    this.error = false;
 
     this.candidatoService.getCandidatos().subscribe({
       next: (data) => {
-        this.candidatos = [...data]; // rompe referencia (fix Angular change detection)
+        console.log('Candidatos:', data);
+
+        this.candidatos = [...data];
+
         this.loading = false;
+
+        // FORZAR RENDER
+        this.cdr.detectChanges();
       },
+
       error: (err) => {
         console.error('Error:', err);
         this.error = true;
         this.loading = false;
+
+        this.cdr.detectChanges();
       },
     });
   }
