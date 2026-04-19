@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -27,25 +27,43 @@ export class ListarJuradosComponent implements OnInit {
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
 
-  constructor(private juradoService: JuradoService) {}
+  loading = true;
+  error = false;
+
+  constructor(
+    private juradoService: JuradoService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.cargarJurados();
   }
 
   cargarJurados(): void {
-    this.jurados = [];
-    this.juradosFiltrados = [];
+    this.loading = true;
+    this.cdr.detectChanges();
 
     this.juradoService.getJurados().subscribe({
       next: (data) => {
-        this.jurados = [...data]; // FIX change detection
-        this.juradosFiltrados = [...data];
+        queueMicrotask(() => {
+          this.jurados = [...data];
+          this.juradosFiltrados = [...data];
+          this.loading = false;
+
+          this.cdr.detectChanges();
+        });
       },
       error: () => {
-        this.toastMessage = 'Error al cargar jurados';
-        this.toastType = 'error';
-        this.showToast = true;
+        queueMicrotask(() => {
+          this.error = true;
+          this.loading = false;
+
+          this.toastMessage = 'Error al cargar jurados';
+          this.toastType = 'error';
+          this.showToast = true;
+
+          this.cdr.detectChanges();
+        });
       },
     });
   }
@@ -53,9 +71,7 @@ export class ListarJuradosComponent implements OnInit {
   onFiltrar(): void {
     this.juradosFiltrados = this.jurados.filter((j) => {
       const coincideTipo = this.filtroTipo ? j.tipoJurado === this.filtroTipo : true;
-
       const coincideEstado = this.filtroEstado ? j.estado === this.filtroEstado : true;
-
       const coincideBusqueda = this.filtroBusqueda
         ? j.nombreCiudadano.toLowerCase().includes(this.filtroBusqueda.toLowerCase())
         : true;
@@ -75,14 +91,14 @@ export class ListarJuradosComponent implements OnInit {
   onEliminar(id: number): void {
     this.jurados = this.jurados.filter((j) => j.idAsignacionJurado !== id);
     this.onFiltrar();
+
     this.toastMessage = 'Jurado eliminado';
     this.toastType = 'success';
     this.showToast = true;
+
+    this.cdr.detectChanges();
   }
 
-  /**
-   * ✅ MAPEO REAL DEL BACK
-   */
   getEstadoClass(estado: string): string {
     const clases: Record<string, string> = {
       CAPACITADO: 'badge--capacitado',

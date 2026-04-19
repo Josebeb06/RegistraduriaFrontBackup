@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastComponent } from '../../../../shared/components/toast/toast.component';
@@ -27,9 +27,13 @@ export class CapacitacionJuradosComponent implements OnInit {
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
 
+  loading = true;
+  error = false;
+
   constructor(
     private juradoService: JuradoService,
     private eleccionService: EleccionService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -37,26 +41,41 @@ export class CapacitacionJuradosComponent implements OnInit {
   }
 
   cargarElecciones(): void {
+    this.loading = true;
+    this.cdr.detectChanges();
+
     this.eleccionService.obtenerElecciones().subscribe({
       next: (data) => {
-        this.elecciones = data.map((e: any) => ({
-          idEleccion: e.idEleccion,
-          nombre: e.nombre,
-        }));
+        queueMicrotask(() => {
+          this.elecciones = data.map((e: any) => ({
+            idEleccion: e.idEleccion,
+            nombre: e.nombre,
+          }));
 
-        setTimeout(() => {
           if (this.elecciones.length > 0) {
             this.eleccionSeleccionada = this.elecciones[0].idEleccion;
             this.onSeleccionarEleccion();
           }
-        }, 0); //FIX detección Angular
+
+          this.loading = false;
+          this.cdr.detectChanges();
+        });
       },
-      error: () => this.mostrarToast('Error al cargar elecciones', 'error'),
+      error: () => {
+        queueMicrotask(() => {
+          this.error = true;
+          this.loading = false;
+
+          this.mostrarToast('Error al cargar elecciones', 'error');
+          this.cdr.detectChanges();
+        });
+      },
     });
   }
 
   onSeleccionarEleccion(): void {
     if (!this.eleccionSeleccionada) return;
+
     this.cargarDashboard();
     this.cargarJurados();
   }
@@ -64,7 +83,10 @@ export class CapacitacionJuradosComponent implements OnInit {
   cargarDashboard(): void {
     this.juradoService.getDashboard(this.eleccionSeleccionada!).subscribe({
       next: (data) => {
-        this.dashboard = data;
+        queueMicrotask(() => {
+          this.dashboard = data;
+          this.cdr.detectChanges();
+        });
       },
       error: () => this.mostrarToast('Error al cargar dashboard', 'error'),
     });
@@ -73,7 +95,10 @@ export class CapacitacionJuradosComponent implements OnInit {
   cargarJurados(): void {
     this.juradoService.getJuradosPorEleccion(this.eleccionSeleccionada!).subscribe({
       next: (data) => {
-        this.jurados = data;
+        queueMicrotask(() => {
+          this.jurados = [...data];
+          this.cdr.detectChanges();
+        });
       },
       error: () => this.mostrarToast('Error al cargar jurados', 'error'),
     });
@@ -90,11 +115,12 @@ export class CapacitacionJuradosComponent implements OnInit {
 
   private mostrarToast(mensaje: string, tipo: 'success' | 'error'): void {
     this.showToast = false;
-    setTimeout(() => {
+    queueMicrotask(() => {
       this.toastMessage = mensaje;
       this.toastType = tipo;
       this.showToast = true;
-    }, 0);
+      this.cdr.detectChanges();
+    });
   }
 
   onCloseToast(): void {
