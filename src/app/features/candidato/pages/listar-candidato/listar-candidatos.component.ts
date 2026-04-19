@@ -17,9 +17,10 @@ export class ListarCandidatosComponent implements OnInit {
   constructor(
     private candidatoService: CandidatoService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {console.log('Componentes de listar candidatos cargados');}
 
   ngOnInit(): void {
+    console.log('ngOnInit de ListarCandidatosComponent llamado - version nueva');
     this.obtenerCandidatos();
   }
 
