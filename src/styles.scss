@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+/* RESET GLOBAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* TIPOGRAFÍA */
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0b1f3a; /* fondo oscuro como landing real */
+  color: #111;
+}
+
+/* EVITA CONTENEDORES LIMITADOS */
+app-root {
+  display: block;
+  width: 100%;
+}
+
+/* FULL WIDTH REAL */
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}

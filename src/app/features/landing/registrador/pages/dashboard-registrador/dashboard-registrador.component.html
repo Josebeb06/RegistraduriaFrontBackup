@@ -1,89 +1,170 @@
-<section class="dashboard">
-  <!-- HERO -->
-  <div class="dashboard__hero">
-    <div class="dashboard__hero-left">
-      <span class="badge">Panel principal del registrador</span>
-      <h1>Gestione lo esencial del proceso electoral desde un solo lugar.</h1>
-      <p>
-        Acceda rápidamente a las funciones más importantes del sistema. Interfaz clara,
-        institucional y eficiente.
+<section class="landing">
+
+  <!-- HERO (PORTADA PRO TRANSPARENTE) -->
+  <section class="hero">
+    <div class="hero__content">
+
+      <h1>
+        Sistema Electoral Nacional
+      </h1>
+
+      <p class="hero__subtitle">
+        Plataforma institucional para la gestión, supervisión y ejecución del proceso electoral en Colombia.
       </p>
+
+      <div class="hero__actions">
+        <button routerLink="/candidato/listar" class="btn btn--primary">Explorar sistema</button>
+        <button class="btn btn--ghost">Ver proceso</button>
+      </div>
+
+      <!-- STATS BIEN ORGANIZADAS -->
+      <div class="hero__stats">
+        <div class="stat">
+          <h3>32</h3>
+          <span>Departamentos</span>
+        </div>
+        <div class="stat">
+          <h3>1100+</h3>
+          <span>Municipios</span>
+        </div>
+        <div class="stat">
+          <h3>100k+</h3>
+          <span>Jurados asignados</span>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <div class="dashboard__hero-card">
-      <h3>Acceso rápido</h3>
-      <ul>
-        <li>✔ Navegación simple</li>
-        <li>✔ Acciones visibles</li>
-        <li>✔ Diseño institucional</li>
-      </ul>
+  <!-- ALERTA OFICIAL -->
+  <section class="alert">
+    ⚠️ Proceso electoral activo: consulte fechas oficiales y cronograma actualizado.
+  </section>
+
+  <!-- FUNCIONALIDADES -->
+  <section class="features">
+    <h2>Módulos del sistema</h2>
+
+    <div class="features__grid">
+
+      <div class="feature-card">
+        <div class="icon">➕</div>
+        <h3>Registro de candidatos</h3>
+        <p>Permite la creación y registro de nuevos candidatos dentro del sistema electoral con validación de datos en tiempo real.</p>
+        <button routerLink="/candidato/crear">Crear →</button>
+     </div>
+      
+      <div class="feature-card">
+        <div class="icon">🧑‍💼</div>
+        <h3>Gestión de candidatos</h3>
+        <p>Registro, actualización y consulta de candidatos dentro del sistema electoral con control centralizado.</p>
+        <button routerLink="/candidato/listar">Ir →</button>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">🗳️</div>
+        <h3>Elecciones</h3>
+        <p>Configuración completa de procesos electorales, fechas clave y parámetros institucionales.</p>
+        <button routerLink="/eleccion/crear">Ir →</button>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">🎲</div>
+        <h3>Sorteo de jurados</h3>
+        <p>Asignación automática de ciudadanos como jurados mediante lógica aleatoria y controlada.</p>
+        <button routerLink="/jurado/sorteo">Ir →</button>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">👥</div>
+        <h3>Gestión de jurados</h3>
+        <p>Consulta, filtrado y administración de jurados asignados en cada proceso electoral.</p>
+        <button routerLink="/jurado/listar">Ir →</button>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">🎓</div>
+        <h3>Capacitación</h3>
+        <p>Seguimiento al estado de formación de los jurados y control de cumplimiento.</p>
+        <button routerLink="/jurado/capacitacion">Ir →</button>
+      </div>
+
     </div>
-  </div>
+  </section>
 
-  <!-- SECCIÓN: Candidatos y Elecciones -->
-  <div class="dashboard__section-title">
-    <h2>Candidatos y Elecciones</h2>
-  </div>
+  <!-- BOLETINES (SUBEN ARRIBA COMO PEDISTE) -->
+  <section class="boletines">
+    <h2>Boletines Oficiales</h2>
 
-  <div class="dashboard__actions">
-    <div class="card">
-      <div class="icon">👤</div>
-      <h3>Crear candidato</h3>
-      <p>Registre un nuevo candidato de forma rápida.</p>
-      <button routerLink="/candidato/crear" class="btn">Crear candidato</button>
+    <div class="boletines__grid">
+
+      <div class="boletin">
+        <span class="boletin__fecha">18/04/2026</span>
+        <h3>Actualización del proceso electoral</h3>
+        <p>La Registraduría Nacional informa a la ciudadanía y a las entidades territoriales sobre la actualización oficial del calendario electoral vigente. Este ajuste incluye nuevas fechas para el cierre de inscripción de candidatos, validación de documentos y publicación de listas oficiales, con el fin de garantizar mayor transparencia y organización en cada etapa del proceso electoral.</p>
+        <button>Leer comunicado →</button>
+      </div>
+
+      <div class="boletin">
+        <span class="boletin__fecha">10/04/2026</span>
+        <h3>Nueva capacitación para jurados</h3>
+        <p>Se da inicio a las jornadas oficiales de capacitación dirigidas a los ciudadanos seleccionados como jurados de votación. Estas sesiones buscan fortalecer el conocimiento sobre el uso del sistema, funciones asignadas y protocolos durante la jornada electoral, asegurando un proceso eficiente, seguro y conforme a la normativa vigente.</p>
+        <button>Ver detalles →</button>
+      </div>
+
+      <div class="boletin">
+        <span class="boletin__fecha">02/04/2026</span>
+        <h3>Mejoras en el sistema</h3>
+        <p>Se han implementado nuevas mejoras en la plataforma Vote4Tech orientadas a optimizar la experiencia del registrador. Entre las actualizaciones se incluyen mayor velocidad en consultas, mejoras en la asignación de jurados y ajustes en los módulos de gestión, permitiendo una administración más ágil y confiable del proceso electoral.</p>
+        <button>Notas de versión →</button>
+      </div>
+
     </div>
+  </section>
 
-    <div class="card">
-      <div class="icon">📋</div>
-      <h3>Candidatos registrados</h3>
-      <p>Consulte la lista actual de candidatos.</p>
-      <button routerLink="/candidato/listar" class="btn">Ver candidatos</button>
+  <!-- PROCESO ELECTORAL -->
+  <section class="process">
+    <h2>Proceso electoral paso a paso</h2>
+    <p class="process__desc">Conozca cada una de las etapas del proceso electoral dentro del sistema.</p>
+
+    <div class="process__steps">
+
+      <div class="step">
+        <div class="circle">1</div>
+        <h4>Registro</h4>
+        <p>Creación y validación de candidatos y elecciones.</p>
+      </div>
+
+      <div class="step">
+        <div class="circle">2</div>
+        <h4>Sorteo</h4>
+        <p>Asignación automatizada de jurados.</p>
+      </div>
+
+      <div class="step">
+        <div class="circle">3</div>
+        <h4>Capacitación</h4>
+        <p>Formación obligatoria de jurados.</p>
+      </div>
+
+      <div class="step">
+        <div class="circle">4</div>
+        <h4>Elección</h4>
+        <p>Ejecución del proceso electoral.</p>
+      </div>
+
     </div>
+  </section>
 
-    <div class="card">
-      <div class="icon">🗳️</div>
-      <h3>Configurar elecciones</h3>
-      <p>Cree y administre elecciones del sistema.</p>
-      <button routerLink="/eleccion/crear" class="btn">Configurar elección</button>
+  <!-- CTA FINAL -->
+  <section class="cta">
+    <h2>¿Listo para gestionar el proceso electoral?</h2>
+    <p>Acceda al sistema y comience a administrar el proceso electoral de forma eficiente.</p>
+
+    <div class="cta__actions">
+      <button routerLink="/login" class="btn btn--primary">Ingresar al sistema</button>
+      <button class="btn btn--ghost">Contactar soporte</button>
     </div>
-  </div>
+  </section>
 
-  <!-- SECCIÓN: Gestión de Jurados ← NUEVO -->
-  <div class="dashboard__section-title">
-    <h2>Gestión de Jurados</h2>
-  </div>
-
-  <div class="dashboard__actions">
-    <div class="card">
-      <div class="icon">🎲</div>
-      <h3>Sorteo de Jurados</h3>
-      <p>Designe ciudadanos como jurados mediante sorteo aleatorio o registro manual.</p>
-      <button routerLink="/jurado/sorteo" class="btn">Ir a sorteo</button>
-    </div>
-
-    <div class="card">
-      <div class="icon">👥</div>
-      <h3>Jurados Registrados</h3>
-      <p>Consulte, filtre y gestione los jurados asignados al proceso electoral.</p>
-      <button routerLink="/jurado/listar" class="btn">Ver jurados</button>
-    </div>
-
-    <div class="card">
-      <div class="icon">🎓</div>
-      <h3>Capacitación de Jurados</h3>
-      <p>Gestione el estado de capacitación de cada jurado asignado.</p>
-      <button routerLink="/jurado/capacitacion" class="btn">Ver capacitación</button>
-    </div>
-  </div>
-
-  <!-- INFO -->
-  <div class="dashboard__info">
-    <h3>Flujo recomendado</h3>
-    <div class="steps">
-      <div class="step">1. Crear candidatos</div>
-      <div class="step">2. Configurar elección</div>
-      <div class="step">3. Ejecutar sorteo de jurados</div>
-      <div class="step">4. Gestionar capacitación</div>
-    </div>
-  </div>
-</section>
+</section> 
