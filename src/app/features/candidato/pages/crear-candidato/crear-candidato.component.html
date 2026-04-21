@@ -1,5 +1,4 @@
 <div class="container">
-  <h1>Crear Candidato</h1>
 
   <app-candidato-form (formSubmit)="onCrearCandidato($event)"> </app-candidato-form>
   <app-toast *ngIf="showToast" [message]="toastMessage" [type]="toastType" (close)="onCloseToast()">
