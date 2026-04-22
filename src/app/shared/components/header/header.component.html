@@ -36,10 +36,11 @@
       <button class="btn-icon">
         Ayuda
       </button>
-
-      <a routerLink="/login" class="btn-primary">
-        Ingresar al Panel
-      </a>
+    <a>
+      <button class="btn-primary" (click)="handleAuthAction()">
+        {{ isLogged ? 'Salir' : 'Ingresar al Panel' }}
+      </button>
+    </a> 
     </div>
 
   </div>

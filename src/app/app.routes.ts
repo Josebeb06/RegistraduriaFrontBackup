@@ -11,6 +11,13 @@ export const routes: Routes = [
       import('./features/landing/registrador/landing-routing.module').then((m) => m.LANDING_ROUTES),
   },
 
+  // AUTH (LOGIN)
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/pages/login/login.component').then(m => m.LoginComponent),
+  },
+  
   /**
    * CANDIDATOS
    */
