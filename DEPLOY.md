@@ -1,179 +1,92 @@
-# Guía de Despliegue — Vote4Tech Registraduría
+# Guía de Despliegue — RegistraduriaFront
 
-## Infraestructura
+Este documento describe el despliegue de **RegistraduriaFront** (aplicación Angular) en el VM de frontends compartido con VotacionFront.
 
-| Componente   | VM / Host           | Puerto |
-|--------------|---------------------|--------|
-| Frontend     | `10.43.97.237`      | `80`   |
-| Backend      | `10.43.100.131`     | `8080` |
-| Base de datos| `10.43.101.13`      | `5432` |
+---
+
+## Infraestructura Completa del Sistema
+
+| Servicio               | VM Producción    | VM QA            | Puerto |
+|------------------------|------------------|------------------|--------|
+| **RegistraduriaFront** | `10.43.97.237`   | `10.43.97.232`   | `80`   |
+| VotacionFront          | `10.43.97.237`   | `10.43.97.232`   | `4201` |
+| RegistraduriaBack      | `10.43.100.131`  | `10.43.99.3`     | `8080` |
+| VotacionBack           | `10.43.100.131`  | `10.43.99.3`     | `8081` |
+| PostgreSQL             | `10.43.101.13`   | `10.43.98.254`   | `5432` |
+| CouchDB                | `10.43.101.13`   | `10.43.98.254`   | `5984` |
+
+> Todos los servicios corren como **contenedores Docker**. Los dos frontends comparten la VM de frontends en puertos distintos (80 y 4201); los dos backends comparten otro VM (8080 y 8081); las bases de datos comparten un tercer VM.
 
 El acceso externo se realiza mediante **Cloudflare Quick Tunnel** (URL temporal generada automáticamente en cada arranque).
 
 ---
 
-## Acceso Remoto a las VMs
+## Acceso a los VMs
 
-Se asume que Java, Maven y Docker ya están instalados en las VMs respectivas.
-
-### Opción A — SSH (terminal)
-
-Desde cualquier equipo en la red o con acceso a las VMs:
+### SSH
 
 ```bash
-# Conectarse al VM del backend
-ssh estudiante@10.43.100.131
-
-# Conectarse al VM del frontend
-ssh estudiante@10.43.97.237
+ssh estudiante@10.43.101.13    # VM Bases de datos
+ssh estudiante@10.43.100.131   # VM Backends
+ssh estudiante@10.43.97.237    # VM Frontends
 ```
 
-Si pide contraseña, ingresar la del usuario `estudiante` en cada VM.
+En Windows, abrir **PowerShell** o **CMD** para usar `ssh` (ya viene instalado en Windows 10/11).
 
-En Windows, abrir **PowerShell** o **CMD** y ejecutar el mismo comando `ssh` (viene instalado por defecto en Windows 10/11).
+### Escritorio Remoto (RDP / xrdp)
 
-### Opción B — Escritorio Remoto (xrdp / RDP)
-
-Las VMs tienen `xrdp` instalado y activo. Para acceder con interfaz gráfica:
-
-1. En Windows: presionar `Win + R`, escribir `mstsc` y presionar Enter
-2. En el campo **Equipo** ingresar la IP de la VM (`10.43.100.131` o `10.43.97.237`)
-3. Hacer clic en **Conectar**
-4. Ingresar usuario `estudiante` y la contraseña correspondiente
-5. Una vez dentro, abrir una **Terminal** desde el escritorio o el menú de aplicaciones
-
-> Desde la terminal del escritorio remoto se ejecutan exactamente los mismos comandos que se muestran en esta guía.
+1. `Win + R` → `mstsc` → ingresar la IP del VM deseado
+2. Usuario: `estudiante`, contraseña del VM
+3. Abrir una terminal desde el escritorio
 
 ---
 
-## Requisitos en cada VM
+## Pre-requisitos
 
-### VM Frontend (`10.43.97.237`)
-- Docker y Docker Compose instalados
-- Puerto 80 libre (el servicio `nginx` del sistema debe estar detenido)
+Antes de desplegar RegistraduriaFront, asegurarse de que:
 
-### VM Backend (`10.43.100.131`)
-- Java 21 instalado (`java -version`)
-- Maven instalado (`mvn -version`)
-- El servicio systemd `vote4tech-back.service` debe estar **detenido y deshabilitado**
+1. **VM de BDs (`10.43.101.13`):** PostgreSQL corriendo en el puerto 5432.
+2. **VM Backend (`10.43.100.131`):** RegistraduriaBack corriendo en el puerto 8080.
+   → Ver `DEPLOY.md` en el repositorio `Vote4TechRegistraduriaBack`.
+3. **VM Frontend (`10.43.97.237`):** Docker instalado, puerto 80 libre.
 
----
-
-## Paso 1 — Preparar el VM Backend (`10.43.100.131`)
-
-Conectarse por SSH al VM del backend:
-
-```bash
-ssh estudiante@10.43.100.131
-```
-
-### 1.1 Detener el servicio systemd que ocupa el puerto 8080
-
-Existe un servicio instalado en el sistema que arranca automáticamente un JAR anterior. Hay que detenerlo:
-
-```bash
-sudo systemctl stop vote4tech-back.service
-sudo systemctl disable vote4tech-back.service
-```
-
-Verificar que el puerto 8080 quedó libre:
-
-```bash
-sudo ss -tlnp | grep 8080
-```
-
-No debe mostrar ningún resultado.
-
-### 1.2 Editar `application.properties` con los valores correctos
-
-```bash
-nano ~/Vote4TechRegistraduriaBack/src/main/resources/application.properties
-```
-
-El archivo debe contener exactamente esto (reemplazar `<CLOUDFLARE_URL>` con el URL real obtenido en el Paso 3):
-
-```properties
-spring.application.name=PortalRegistraduriaBack
-server.port=8080
-spring.datasource.url=jdbc:postgresql://10.43.101.13:5432/bd_nacional_vote4tech
-spring.datasource.username=admin_db_nacional
-spring.datasource.password=12345
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-config.cors.allowed-origins=https://<CLOUDFLARE_URL>.trycloudflare.com,http://10.43.97.237
-logging.level.org.springframework=INFO
-```
-
-> **Nota:** La primera vez se puede colocar un URL temporal en `allowed-origins`. Se actualiza después de obtener el URL real (Paso 3).
-
-### 1.3 Arrancar el backend
-
-```bash
-cd ~/Vote4TechRegistraduriaBack
-mvn spring-boot:run 2>&1 | tee /tmp/log.txt
-```
-
-Esperar hasta ver la línea:
-
-```
-Started PortalRegistraduriaBackApplication in X.X seconds
-```
-
-Dejar esta terminal abierta o usar `tmux` para que siga corriendo en segundo plano:
-
-```bash
-# Con tmux (recomendado):
-tmux new -s backend
-mvn spring-boot:run 2>&1 | tee /tmp/log.txt
-# Para desconectarse sin matar el proceso: Ctrl+B, luego D
-```
-
----
-
-## Paso 2 — Desplegar el Frontend (`10.43.97.237`)
-
-Conectarse por SSH al VM del frontend:
+Detener el nginx del sistema si está activo (solo la primera vez):
 
 ```bash
 ssh estudiante@10.43.97.237
-```
-
-### 2.1 Detener el nginx del sistema (solo la primera vez)
-
-```bash
 sudo systemctl stop nginx
 sudo systemctl disable nginx
 ```
 
-### 2.2 Subir el código (si no está ya en el VM)
+---
 
-**Opción A — Desde acceso remoto al VM (SSH o xrdp):**
+## Paso 1 — RegistraduriaFront (`10.43.97.237`, puerto 80)
 
-Si el repositorio ya está en la VM o está disponible en git, clonarlo directamente desde la terminal del VM:
+Conectarse por SSH al VM de frontends:
+
+```bash
+ssh estudiante@10.43.97.237
+```
+
+### 1.1 Subir el código
+
+**Opción A — git:**
 
 ```bash
 cd ~
 git clone <URL_DEL_REPOSITORIO> Vote4TechRegistraduriaFront
+# o si ya existe:
+cd ~/Vote4TechRegistraduriaFront && git pull
 ```
 
-Si ya existe la carpeta y solo se quieren traer los últimos cambios:
-
-```bash
-cd ~/Vote4TechRegistraduriaFront
-git pull
-```
-
-**Opción B — Desde PowerShell local (Windows):**
-
-Copiar el proyecto al VM excluyendo `node_modules`:
+**Opción B — PowerShell local (Windows):**
 
 ```powershell
-robocopy "C:\ruta\al\Vote4TechRegistraduriaFront" "$env:TEMP\vote4tech-front-deploy" /E /XD node_modules .angular
-scp -r "$env:TEMP\vote4tech-front-deploy" estudiante@10.43.97.237:~/Vote4TechRegistraduriaFront
+robocopy "C:\ruta\al\Vote4TechRegistraduriaFront" "$env:TEMP\rfront-deploy" /E /XD node_modules .angular
+scp -r "$env:TEMP\rfront-deploy" estudiante@10.43.97.237:~/Vote4TechRegistraduriaFront
 ```
 
-### 2.3 Levantar los contenedores
+### 1.2 Levantar los contenedores
 
 ```bash
 cd ~/Vote4TechRegistraduriaFront
@@ -186,42 +99,49 @@ Verificar que los contenedores están corriendo:
 docker ps
 ```
 
-Deben aparecer dos contenedores: `frontend` y `cloudflared`.
+Deben aparecer dos contenedores: `vote4tech-front` y `vote4tech-cloudflared`.
+
+> **Nota:** VotacionFront también corre en este mismo VM en el puerto 4201 con sus propios contenedores (`vote4tech-votacion-front` y `vote4tech-votacion-cloudflared`). Los dos frontends son independientes y no se interfieren.
 
 ---
 
-## Paso 3 — Obtener el URL de Cloudflare
+## Paso 2 — Obtener el URL de Cloudflare
 
-En el VM del frontend, obtener el URL generado por el túnel:
+Obtener el URL generado por el túnel de RegistraduriaFront:
 
 ```bash
-docker logs $(docker ps -q --filter name=cloudflared) 2>&1 | grep trycloudflare
+docker logs vote4tech-cloudflared 2>&1 | grep trycloudflare
 ```
 
 El URL tiene la forma `https://xxxx-xxxx-xxxx-xxxx.trycloudflare.com`.
 
-### 3.1 Actualizar CORS en el backend
+### 2.1 Actualizar CORS en RegistraduriaBack
 
-Si el URL de Cloudflare es diferente al que estaba en `application.properties`, actualizar en el VM del backend:
+Conectarse al VM Backend y editar `docker/docker-compose.prod.yml`:
 
 ```bash
-nano ~/Vote4TechRegistraduriaBack/src/main/resources/application.properties
+ssh estudiante@10.43.100.131
+nano ~/Vote4TechRegistraduriaBack/docker/docker-compose.prod.yml
 ```
 
-Cambiar la línea `config.cors.allowed-origins` con el nuevo URL. Luego reiniciar el backend:
+Actualizar `CORS_ALLOWED_ORIGINS`:
+
+```yaml
+CORS_ALLOWED_ORIGINS: "http://10.43.97.237,https://NUEVO_URL.trycloudflare.com"
+```
+
+Reconstruir el backend:
 
 ```bash
-# Si está en tmux:
-tmux attach -t backend
-# Ctrl+C para detener, luego:
-mvn spring-boot:run 2>&1 | tee /tmp/log.txt
+cd ~/Vote4TechRegistraduriaBack
+docker compose -f docker/docker-compose.prod.yml up -d --build
 ```
 
 ---
 
-## Paso 4 — Verificar el despliegue
+## Paso 3 — Verificar el despliegue
 
-### 4.1 Verificar que el API gateway responde (desde el VM del frontend)
+Desde el VM Frontend, verificar que el API gateway de nginx funciona:
 
 ```bash
 curl http://localhost/api/eleccion/elecciones
@@ -229,9 +149,7 @@ curl http://localhost/api/eleccion/elecciones
 
 Debe devolver un JSON con las elecciones. Si devuelve HTML de Angular, revisar `docker/nginx.conf`.
 
-### 4.2 Verificar acceso externo
-
-Abrir desde un navegador con datos móviles (fuera de la red universitaria):
+Verificar acceso externo desde un navegador:
 
 ```
 https://xxxx-xxxx-xxxx-xxxx.trycloudflare.com
@@ -239,43 +157,118 @@ https://xxxx-xxxx-xxxx-xxxx.trycloudflare.com
 
 ---
 
-## Troubleshooting
+## Actualizar el Despliegue con Nuevos Cambios
 
-### Puerto 8080 ocupado en el backend
+Conectarse al VM Frontend (`10.43.97.237`):
 
-```bash
-sudo systemctl stop vote4tech-back.service
-sudo systemctl disable vote4tech-back.service
-sudo ss -tlnp | grep 8080
-```
-
-Si aún aparece un proceso Java:
-
-```bash
-sudo kill -9 $(sudo lsof -t -i:8080)
-```
-
-### El URL de Cloudflare cambió
-
-El URL cambia cada vez que el contenedor `cloudflared` se reinicia. Solución:
-
-1. Obtener el nuevo URL (ver Paso 3)
-2. Actualizar `application.properties` en el backend
-3. Reiniciar el backend
-
-Para un URL permanente, crear una cuenta gratuita en [Cloudflare Zero Trust](https://one.dash.cloudflare.com) y configurar un Named Tunnel con dominio propio.
-
-### Ver logs del frontend
-
-```bash
-docker logs $(docker ps -q --filter name=frontend) --tail=50
-```
-
-### Reiniciar solo el frontend sin reconstruir
+**Opción A — git:**
 
 ```bash
 cd ~/Vote4TechRegistraduriaFront
-docker compose -f docker/docker-compose.prod.yml restart frontend
+git pull
+docker compose -f docker/docker-compose.prod.yml up -d --build
+```
+
+**Opción B — código manual (desde PowerShell local):**
+
+```powershell
+robocopy "C:\ruta\al\Vote4TechRegistraduriaFront" "$env:TEMP\rfront-deploy" /E /XD node_modules .angular
+scp -r "$env:TEMP\rfront-deploy" estudiante@10.43.97.237:~/Vote4TechRegistraduriaFront
+```
+
+Luego en el VM:
+
+```bash
+cd ~/Vote4TechRegistraduriaFront
+docker compose -f docker/docker-compose.prod.yml up -d --build
+```
+
+> `--build` es obligatorio. Sin él, Docker usa la imagen cacheada y los cambios no se aplican.
+
+---
+
+## Ambiente QA
+
+El ambiente QA usa VMs distintas. Los pasos son idénticos, cambiando solo las IPs.
+
+| Servicio               | VM Producción    | VM QA            | Puerto |
+|------------------------|------------------|------------------|--------|
+| RegistraduriaFront     | `10.43.97.237`   | `10.43.97.232`   | `80`   |
+| VotacionFront          | `10.43.97.237`   | `10.43.97.232`   | `4201` |
+| RegistraduriaBack      | `10.43.100.131`  | `10.43.99.3`     | `8080` |
+| VotacionBack           | `10.43.100.131`  | `10.43.99.3`     | `8081` |
+| PostgreSQL             | `10.43.101.13`   | `10.43.98.254`   | `5432` |
+| CouchDB                | `10.43.101.13`   | `10.43.98.254`   | `5984` |
+
+### Cambios en VM Frontend QA (`10.43.97.232`)
+
+En `docker/nginx.conf`, cambiar el `proxy_pass`:
+
+```nginx
+# De:
+proxy_pass http://10.43.100.131:8080/;
+# A:
+proxy_pass http://10.43.99.3:8080/;
+```
+
+Reconstruir:
+
+```bash
+cd ~/Vote4TechRegistraduriaFront
+docker compose -f docker/docker-compose.prod.yml up -d --build
+```
+
+Obtener el URL de Cloudflare QA:
+
+```bash
+docker logs vote4tech-cloudflared 2>&1 | grep trycloudflare
+```
+
+Actualizar `CORS_ALLOWED_ORIGINS` en el backend QA con este URL y `http://10.43.97.232`.
+
+---
+
+## Troubleshooting
+
+### Puerto 80 ocupado (nginx del sistema)
+
+```bash
+sudo systemctl stop nginx
+sudo systemctl disable nginx
+sudo ss -tlnp | grep :80
+```
+
+### El contenedor del frontend no levanta
+
+```bash
+docker logs vote4tech-front --tail=50
+```
+
+Si falla al iniciar nginx, verificar que `docker/nginx.conf` tiene el `proxy_pass` correcto.
+
+### El API gateway devuelve 502 Bad Gateway
+
+El backend no está respondiendo. Verificar desde el VM Frontend:
+
+```bash
+curl http://10.43.100.131:8080/eleccion/elecciones
+```
+
+Si no responde, revisar los logs del backend en `10.43.100.131`.
+
+### El URL de Cloudflare cambió
+
+El URL cambia cada vez que el contenedor `vote4tech-cloudflared` se reinicia.
+
+1. Obtener el nuevo URL: `docker logs vote4tech-cloudflared 2>&1 | grep trycloudflare`
+2. Actualizar `CORS_ALLOWED_ORIGINS` en `docker/docker-compose.prod.yml` de RegistraduriaBack
+3. Reconstruir RegistraduriaBack: `docker compose -f docker/docker-compose.prod.yml up -d --build`
+
+### Reiniciar sin reconstruir
+
+```bash
+cd ~/Vote4TechRegistraduriaFront
+docker compose -f docker/docker-compose.prod.yml restart
 ```
 
 ### Reconstruir completamente
@@ -285,150 +278,3 @@ cd ~/Vote4TechRegistraduriaFront
 docker compose -f docker/docker-compose.prod.yml down
 docker compose -f docker/docker-compose.prod.yml up -d --build
 ```
-
----
-
-## Actualizar el Despliegue con Nuevos Cambios de Código
-
-Los cambios guardados localmente **no se reflejan automáticamente** en el despliegue. Hay que subir el código y aplicar los cambios manualmente.
-
-### Actualizar el Frontend
-
-Conectarse al VM del frontend (`10.43.97.237`) y ejecutar:
-
-**Opción A — si el repositorio está en git:**
-```bash
-cd ~/Vote4TechRegistraduriaFront
-git pull
-docker compose -f docker/docker-compose.prod.yml up -d --build
-```
-
-**Opción B — si se sube el código manualmente (desde PowerShell local):**
-```powershell
-robocopy "C:\ruta\al\Vote4TechRegistraduriaFront" "$env:TEMP\vote4tech-front-deploy" /E /XD node_modules .angular
-scp -r "$env:TEMP\vote4tech-front-deploy" estudiante@10.43.97.237:~/Vote4TechRegistraduriaFront
-```
-Luego en el VM:
-```bash
-cd ~/Vote4TechRegistraduriaFront
-docker compose -f docker/docker-compose.prod.yml up -d --build
-```
-
-> **Importante:** el flag `--build` es obligatorio. Sin él, Docker usa la imagen anterior cacheada y los cambios no se aplican.
-
-### Actualizar el Backend
-
-Conectarse al VM del backend (`10.43.100.131`) y ejecutar:
-
-**Opción A — si el repositorio está en git:**
-```bash
-cd ~/Vote4TechRegistraduriaBack
-git pull
-```
-
-**Opción B — si se sube el código manualmente (desde PowerShell local):**
-```powershell
-robocopy "C:\ruta\al\Vote4TechRegistraduriaBack" "$env:TEMP\vote4tech-back-deploy" /E /XD target
-scp -r "$env:TEMP\vote4tech-back-deploy" estudiante@10.43.100.131:~/Vote4TechRegistraduriaBack
-```
-
-Luego detener el proceso actual y reiniciar Maven (que recompila automáticamente al arrancar):
-
-```bash
-# Si está corriendo en tmux:
-tmux attach -t backend
-# Ctrl+C para detener, luego:
-cd ~/Vote4TechRegistraduriaBack
-mvn spring-boot:run 2>&1 | tee /tmp/log.txt
-```
-
----
-
-## Ambiente QA
-
-El ambiente de QA usa máquinas distintas a producción. Los pasos son los mismos, pero con las siguientes IPs:
-
-| Componente   | VM Producción       | VM QA               | Puerto |
-|--------------|---------------------|---------------------|--------|
-| Frontend     | `10.43.97.237`      | `10.43.97.232`      | `80`   |
-| Backend      | `10.43.100.131`     | `10.43.99.3`        | `8080` |
-| Base de datos| `10.43.101.13`      | `10.43.98.254`      | `5432` |
-
-### Qué cambiar en el VM Backend QA (`10.43.99.3`)
-
-Editar `application.properties` con las IPs de QA:
-
-```bash
-nano ~/Vote4TechRegistraduriaBack/src/main/resources/application.properties
-```
-
-```properties
-spring.application.name=PortalRegistraduriaBack
-server.port=8080
-spring.datasource.url=jdbc:postgresql://10.43.98.254:5432/bd_nacional_vote4tech
-spring.datasource.username=admin_db_nacional
-spring.datasource.password=12345
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-config.cors.allowed-origins=https://<CLOUDFLARE_URL>.trycloudflare.com,http://10.43.97.232
-logging.level.org.springframework=INFO
-```
-
-Diferencias respecto a producción:
-- `spring.datasource.url` apunta a `10.43.98.254` en lugar de `10.43.101.13`
-- `config.cors.allowed-origins` incluye `10.43.97.232` en lugar de `10.43.97.237`
-
-Luego arrancar normalmente:
-
-```bash
-cd ~/Vote4TechRegistraduriaBack
-mvn spring-boot:run 2>&1 | tee /tmp/log.txt
-```
-
-### Qué cambiar en el VM Frontend QA (`10.43.97.232`)
-
-El `nginx.conf` tiene hardcodeada la IP del backend. Hay que editarlo antes de construir el contenedor:
-
-```bash
-nano ~/Vote4TechRegistraduriaFront/docker/nginx.conf
-```
-
-Cambiar la línea `proxy_pass` de:
-
-```nginx
-proxy_pass http://10.43.100.131:8080/;
-```
-
-a:
-
-```nginx
-proxy_pass http://10.43.99.3:8080/;
-```
-
-Guardar y luego levantar los contenedores:
-
-```bash
-cd ~/Vote4TechRegistraduriaFront
-docker compose -f docker/docker-compose.prod.yml up -d --build
-```
-
-> El `--build` es obligatorio para que Nginx tome el nuevo `nginx.conf`.
-
-Obtener el URL de Cloudflare:
-
-```bash
-docker logs $(docker ps -q --filter name=cloudflared) 2>&1 | grep trycloudflare
-```
-
-Actualizar ese URL en el `application.properties` del backend QA y reiniciar el backend.
-
-### Verificar QA
-
-Desde el VM frontend QA:
-
-```bash
-curl http://localhost/api/eleccion/elecciones
-```
-
-Debe devolver JSON. Si devuelve un error de conexión, verificar que el backend en `10.43.99.3:8080` está corriendo.
