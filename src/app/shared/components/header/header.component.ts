@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthStateService } from '../../services/auth-state.service';
@@ -10,35 +10,40 @@ import { Subscription } from 'rxjs';
   imports: [CommonModule, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   userName: string | null = null;
   userType: string | null = null;
   private subscription: Subscription | null = null;
+  private authChangeHandler: (() => void) | null = null; 
 
   constructor(
     private authService: AuthStateService,
     private router: Router,
+    private cdr: ChangeDetectorRef, 
   ) {}
 
   ngOnInit() {
-    // Suscribirse al observable de usuario
     this.subscription = this.authService.user$.subscribe((user) => {
       this.isAuthenticated = !!user;
       this.userName = user?.usuario || user?.username || null;
       this.userType = user?.tipo || null;
+      this.cdr.markForCheck();
     });
 
-    // Escuchar cambios de auth desde otros tabs/windows
-    window.addEventListener('authChange', () => this.updateAuthState());
+    this.authChangeHandler = () => this.updateAuthState();
+    window.addEventListener('authChange', this.authChangeHandler);
   }
 
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-    window.removeEventListener('authChange', () => this.updateAuthState());
+    if (this.authChangeHandler) {
+      window.removeEventListener('authChange', this.authChangeHandler);
+    }
   }
 
   private updateAuthState() {
@@ -46,6 +51,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isAuthenticated = !!user;
     this.userName = user?.usuario || user?.username || null;
     this.userType = user?.tipo || null;
+    this.cdr.markForCheck(); 
   }
 
   onLogout() {

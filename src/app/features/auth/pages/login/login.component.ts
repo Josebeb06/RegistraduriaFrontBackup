@@ -59,9 +59,22 @@ export class LoginComponent {
         this.loading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error en login:', err);
-        this.showError('Credenciales incorrectas o error del servidor');
+        
+        let errorMessage = 'Error desconocido';
+        
+        if (err.status === 401) {
+          errorMessage = 'Credenciales incorrectas';
+        } else if (err.status === 400) {
+          errorMessage = 'Datos inválidos. Verifique usuario y contraseña';
+        } else if (err.status === 500) {
+          errorMessage = 'Error del servidor. Intente más tarde';
+        } else if (err.status === 0) {
+          errorMessage = 'No se puede conectar al servidor';
+        }
+        
+        this.showError(errorMessage);
         this.loading = false;
         this.cdr.detectChanges();
       },

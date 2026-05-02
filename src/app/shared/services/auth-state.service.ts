@@ -10,13 +10,16 @@ export interface UserData {
   email?: string;
   rol?: string;
   tipo?: string; // 'registrador' | 'consejo' | 'admin'
+  exp?: number; // Expiración del JWT (en segundos)
+  iat?: number; // Issued at (en segundos)
+  sub?: string; // Subject (usuario)
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthStateService {
-  private apiUrl = 'http://10.43.100.131:8080';
+  private apiUrl = '/api';
   
   // Signal para reactividad
   currentUser = signal<UserData | null>(null);
@@ -46,17 +49,13 @@ export class AuthStateService {
     }
   }
 
-  /**
-   * Login de Registrador
-   */
   loginRegistrador(usuario: string, password: string): Observable<any> {
     return this.http
       .post(`${this.apiUrl}/registrador/login`, { usuario, password }, {
-        responseType: 'text' // ← IMPORTANTE: Recibe como texto plano
+        responseType: 'text'
       })
       .pipe(
         tap((token: string) => {
-          console.log('Token recibido:', token);
           if (token && token.length > 0) {
             this.saveAuth(token, 'registrador');
           } else {
@@ -66,17 +65,13 @@ export class AuthStateService {
       );
   }
 
-  /**
-   * Login de Consejo Nacional Electoral
-   */
   loginConsejoNacional(username: string, password: string): Observable<any> {
     return this.http
       .post(`${this.apiUrl}/consejo-nacional/login`, { username, password }, {
-        responseType: 'text' // ← IMPORTANTE: Recibe como texto plano
+        responseType: 'text'
       })
       .pipe(
         tap((token: string) => {
-          console.log('Token recibido:', token);
           if (token && token.length > 0) {
             this.saveAuth(token, 'consejo');
           } else {
@@ -86,20 +81,16 @@ export class AuthStateService {
       );
   }
 
-  /**
-   * Login de Administrador Electoral
-   */
   loginAdministrador(usuario: string, password: string): Observable<any> {
     return this.http
       .post(`${this.apiUrl}/administrador-electoral/login`, {
         usuario,
         password,
       }, {
-        responseType: 'text' // ← IMPORTANTE: Recibe como texto plano
+        responseType: 'text'
       })
       .pipe(
         tap((token: string) => {
-          console.log('Token recibido:', token);
           if (token && token.length > 0) {
             this.saveAuth(token, 'admin');
           } else {
@@ -150,6 +141,22 @@ export class AuthStateService {
    */
   getToken(): string | null {
     return localStorage.getItem('authToken');
+  }
+
+  /**
+   * Verificar si token está expirado
+   */
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    
+    try {
+      const decoded = this.decodeToken(token);
+      if (!decoded.exp) return false; // Si no tiene exp, asumimos que es válido
+      return decoded.exp * 1000 < Date.now(); // exp está en segundos, Date.now() en ms
+    } catch {
+      return true;
+    }
   }
 
   /**

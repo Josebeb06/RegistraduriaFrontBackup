@@ -16,9 +16,16 @@ export class AuthInterceptor implements HttpInterceptor {
     request: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
+    
+    const isLoginRequest = request.url.includes('/login');
+    
+    if (isLoginRequest) {
+      return next.handle(request);
+    }
+
+    // Para otras rutas, agregar el token si existe
     const token = this.authService.getToken();
 
-    // Si existe token, agregarlo al header Authorization
     if (token) {
       request = request.clone({
         setHeaders: {
