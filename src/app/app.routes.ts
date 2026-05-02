@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './features/auth/guards/auth.guard';
 
 export const routes: Routes = [
   /**
@@ -9,9 +10,10 @@ export const routes: Routes = [
     path: '',
     loadChildren: () =>
       import('./features/landing/registrador/landing-routing.module').then((m) => m.LANDING_ROUTES),
+    canActivate: [AuthGuard], // ← PROTEGIDA
   },
 
-  // AUTH (LOGIN)
+  // AUTH (LOGIN) - SIN PROTECCIÓN
   {
     path: 'login',
     loadComponent: () =>
@@ -25,6 +27,7 @@ export const routes: Routes = [
     path: 'candidato',
     loadChildren: () =>
       import('./features/candidato/candidato.module').then((m) => m.CandidatoModule),
+    canActivate: [AuthGuard], // ← PROTEGIDA
   },
 
   /**
@@ -33,14 +36,16 @@ export const routes: Routes = [
   {
     path: 'eleccion',
     loadChildren: () => import('./features/eleccion/eleccion.module').then((m) => m.EleccionModule),
+    canActivate: [AuthGuard], // ← PROTEGIDA
   },
 
   /**
-   * JURADOS ← NUEVO
+   * JURADOS
    */
   {
     path: 'jurado',
     loadChildren: () => import('./features/jurado/jurado.module').then((m) => m.JuradoModule),
+    canActivate: [AuthGuard], // ← PROTEGIDA
   },
 
   /**

@@ -4,22 +4,40 @@
     <div class="login__card">
       <h1>Ingreso al sistema</h1>
       <p class="subtitle">
-        Acceda al panel del registrador para gestionar el proceso electoral
+        Acceda al sistema para gestionar el proceso electoral
       </p>
 
       <form (ngSubmit)="onLogin()" #form="ngForm">
 
+        <!-- SELECTOR DE TIPO DE USUARIO -->
         <div class="form-group">
-          <label>Usuario</label>
+          <label>Tipo de Usuario</label>
+          <select
+            [(ngModel)]="tipoUsuario"
+            name="tipoUsuario"
+            required
+            class="form-select">
+            <option value="registrador">Registrador</option>
+            <option value="consejo">Consejo Nacional Electoral</option>
+            <option value="admin">Administrador Electoral</option>
+          </select>
+        </div>
+
+        <!-- USUARIO / USERNAME -->
+        <div class="form-group">
+          <label>
+            {{ tipoUsuario === 'consejo' ? 'Username' : 'Usuario' }}
+          </label>
           <input
             type="text"
             [(ngModel)]="usuario"
             name="usuario"
             required
-            placeholder="Ingrese su usuario"
+            [placeholder]="tipoUsuario === 'consejo' ? 'Ingrese su username' : 'Ingrese su usuario'"
           />
         </div>
 
+        <!-- CONTRASEÑA -->
         <div class="form-group">
           <label>Contraseña</label>
           <input
