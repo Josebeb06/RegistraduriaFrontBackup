@@ -1,0 +1,187 @@
+:host {
+  display: block;
+
+  // 🎨 TOKENS (puedes luego moverlos a styles.scss si quieres global)
+  --navy: #0d2645;
+  --navy-mid: #163a6b;
+  --gold: #c8922a;
+  --gold-light: #e8b04a;
+  --white: #ffffff;
+  --grey-300: #b0bac9;
+}
+
+/* ─────────────────────────────────────────
+   FORM CARD
+───────────────────────────────────────── */
+.form-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  &__header {
+    margin-bottom: 20px;
+
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+      color: var(--navy);
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   FIELD
+───────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  &__input,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #dcdcdc;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: var(--navy-mid);
+      box-shadow: 0 0 0 2px rgba(22, 58, 107, 0.15);
+    }
+  }
+
+  &__error {
+    font-size: 0.75rem;
+    color: #d32f2f;
+  }
+}
+
+/* ─────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────── */
+.btn-search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+
+  background: var(--navy);
+  color: var(--white);
+
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--navy-mid);
+  }
+}
+
+/* ─────────────────────────────────────────
+   FORM ACTIONS
+───────────────────────────────────────── */
+.form-actions {
+  display: flex;
+  gap: 10px;
+
+  button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  button:first-child {
+    background: #eee;
+  }
+
+  button:last-child {
+    background: var(--gold);
+    color: var(--white);
+
+    &:hover {
+      background: var(--gold-light);
+    }
+  }
+}
+
+/* ─────────────────────────────────────────
+   CITIZEN CARD
+───────────────────────────────────────── */
+.citizen-card {
+  background: #f8f9fb;
+  border-radius: 10px;
+  padding: 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  h3 {
+    font-size: 1rem;
+    color: var(--navy);
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: #555;
+  }
+}
+
+/* ─────────────────────────────────────────
+   TOASTS
+───────────────────────────────────────── */
+.inline-toast {
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+
+  &--error {
+    background: #fdecea;
+    color: #c62828;
+  }
+
+  &--success {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .form-card {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}
