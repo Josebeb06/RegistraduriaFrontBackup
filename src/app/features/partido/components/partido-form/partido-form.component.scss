@@ -20,7 +20,6 @@
   position: relative;
 }
 
-/* BOTÓN VOLVER */
 .back-btn {
   background: transparent;
   border: none;
@@ -30,19 +29,16 @@
   font-weight: 600;
   padding: 6px 10px;
   border-radius: 6px;
-  transition: 0.2s;
 
   &:hover {
     background: rgba(255, 255, 255, 0.15);
   }
 }
 
-/* CENTRAR TITULO */
 .navbar-title {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-weight: 600;
 }
 
 /* FORM */
@@ -62,18 +58,15 @@ label {
   color: #374151;
 }
 
-input,
-select {
+input {
   width: 490px;
   padding: 11px;
   margin-top: 5px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  transition: 0.2s;
 }
 
-input:focus,
-select:focus {
+input:focus {
   border-color: #facc15;
   box-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
 }
@@ -94,8 +87,8 @@ select:focus {
 .files-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  justify-items: center;
   gap: 30px;
+  justify-items: center;
 }
 
 /* TARJETAS */
@@ -105,10 +98,10 @@ select:focus {
   border-radius: 12px;
   border: 2px dashed #cbd5e1;
   padding: 15px;
-  text-align: center;
-  transition: 0.3s;
-  position: relative;
   background: #f9fafb;
+  text-align: center;
+  position: relative;
+  transition: 0.3s;
 }
 
 .file-card:hover {
@@ -117,15 +110,15 @@ select:focus {
   box-shadow: 0 0 15px rgba(250, 204, 21, 0.3);
 }
 
-/* POSICIONAR LOS DE ABAJO CENTRADOS */
+/* CENTRADO PERFECTO FILA INFERIOR */
 .file-card.bottom:nth-child(4) {
-  grid-column: 1 / span 1;
-  transform: translateX(60%);
+  grid-column: 1;
+  transform: translateX(70%);
 }
 
 .file-card.bottom:nth-child(5) {
-  grid-column: 3 / span 1;
-  transform: translateX(-60%);
+  grid-column: 3;
+  transform: translateX(-70%);
 }
 
 /* TITULO */
@@ -144,11 +137,10 @@ select:focus {
   color: white;
   font-size: 12px;
   cursor: pointer;
-  transition: 0.3s;
-}
 
-.upload-btn:hover {
-  background: #004080;
+  &:hover {
+    background: #004080;
+  }
 }
 
 /* PREVIEW */
@@ -158,8 +150,8 @@ select:focus {
   border-radius: 8px;
   background: #eef2ff;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   position: relative;
 }
 
@@ -170,19 +162,19 @@ select:focus {
   gap: 8px;
 }
 
-/* ICONO PDF */
+/* ICONO */
 .pdf-icon {
   font-size: 20px;
 }
 
-/* NOMBRE ARCHIVO */
+/* TEXTO */
 .file-name {
   font-size: 12px;
   color: #111827;
   word-break: break-word;
 }
 
-/* BOTÓN ELIMINAR */
+/* ELIMINAR */
 .remove-btn {
   position: absolute;
   top: -8px;
@@ -195,11 +187,10 @@ select:focus {
   height: 22px;
   border-radius: 50%;
   cursor: pointer;
-  transition: 0.2s;
-}
 
-.remove-btn:hover {
-  background: #dc2626;
+  &:hover {
+    background: #dc2626;
+  }
 }
 
 /* BOTÓN FINAL */
@@ -212,10 +203,9 @@ select:focus {
   border: none;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
-}
 
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(0, 45, 87, 0.4);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 45, 87, 0.4);
+  }
 }
