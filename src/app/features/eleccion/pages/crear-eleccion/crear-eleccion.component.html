@@ -1,30 +1,770 @@
-<section class="crear-eleccion">
-  <header class="crear-eleccion__header">
-    <h1 class="crear-eleccion__title">Crear Elección</h1>
-    <p class="crear-eleccion__subtitle">
-      Configura una nueva elección dentro del sistema electoral
-    </p>
-  </header>
+<!-- ══ PAGE HERO ══ -->
+<section class="page-hero">
+  <div class="page-hero__inner">
+    <nav class="breadcrumb">
+      <a routerLink="/" class="breadcrumb__item">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+          />
+        </svg>
+        Inicio
+      </a>
+      <svg
+        class="breadcrumb__sep"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+      <a routerLink="/" class="breadcrumb__item">Módulo Electoral</a>
+      <svg
+        class="breadcrumb__sep"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+      <span class="breadcrumb__item breadcrumb__item--active">Creación de Elecciones</span>
+    </nav>
 
-  <div class="crear-eleccion__container">
-    <!-- Panel izquierdo -->
-    <div class="crear-eleccion__info">
-      <h2>Información</h2>
-      <p>Complete los datos necesarios para registrar una nueva elección.</p>
-
-      <ul>
-        <li>Defina el nombre de la elección</li>
-        <li>Seleccione el tipo</li>
-        <li>Configure fechas correctamente</li>
-      </ul>
+    <div class="page-hero__body">
+      <div class="page-hero__titles">
+        <span class="page-hero__kicker">MÓDULO ELECTORAL · PRINCIPAL</span>
+        <h1 class="page-hero__title">Creación de <em>Elecciones</em></h1>
+        <p class="page-hero__desc">
+          Configure una nueva jornada electoral definiendo tipo, fechas, circunscripciones y
+          parámetros de votación. Los datos serán validados automáticamente según la normativa
+          electoral vigente.
+        </p>
+      </div>
+      <div class="page-hero__badges">
+        <div class="badge badge--outlined">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+          </svg>
+          Validación automática
+        </div>
+        <div class="badge badge--warning">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
+          Requiere rol: Administrador
+        </div>
+      </div>
     </div>
 
-    <!-- Panel derecho -->
-    <div class="crear-eleccion__form-container">
-      <!-- AQUÍ ESTÁ LA CONEXIÓN -->
-      <app-eleccion-form (formSubmit)="onCrearEleccion($event)"></app-eleccion-form>
+    <div class="page-hero__status">
+      <div class="status-dot"></div>
+      <span>Sistema activo · Jornada Electoral 2026</span>
     </div>
   </div>
-  <app-toast *ngIf="showToast" [message]="toastMessage" [type]="toastType" (close)="onCloseToast()">
-  </app-toast>
 </section>
+
+<!-- ══ MAIN ══ -->
+<main class="main-content">
+  <div class="content-grid">
+    <!-- ── COLUMNA IZQUIERDA ── -->
+    <div class="col-main">
+      <!-- Toast éxito -->
+      <div class="toast toast--success" *ngIf="successMessage">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>{{ successMessage }}</span>
+        <button class="toast__close" (click)="successMessage = ''; cdr.detectChanges()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Toast error -->
+      <div class="toast toast--error" *ngIf="errorMessage">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <span>{{ errorMessage }}</span>
+        <button class="toast__close" (click)="errorMessage = ''; cdr.detectChanges()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- FORM CARD -->
+      <div class="form-card">
+        <div class="form-card__header">
+          <div class="form-card__icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h2 class="form-card__title">Configuración de jornada electoral</h2>
+            <p class="form-card__sub">
+              Complete todos los campos requeridos para crear una nueva elección en el sistema.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-card__body" [formGroup]="eleccionForm">
+          <!-- Nombre -->
+          <div class="field">
+            <div class="field__label-row">
+              <label class="field__label" for="nombre">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Nombre de la elección
+              </label>
+              <span class="field__required">REQUERIDO</span>
+            </div>
+            <div class="field__input-wrap">
+              <input
+                class="field__input"
+                [class.field__input--error]="nombre?.invalid && nombre?.touched"
+                id="nombre"
+                type="text"
+                placeholder="Ej. Elecciones Locales 2026"
+                maxlength="120"
+                formControlName="nombre"
+              />
+              <svg
+                class="field__icon"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <span class="field__hint" *ngIf="!(nombre?.invalid && nombre?.touched)">
+              Máximo 120 caracteres. Sea descriptivo con el nombre de la jornada electoral.
+            </span>
+            <span class="field__error" *ngIf="nombre?.invalid && nombre?.touched">
+              El nombre es obligatorio (mínimo 5 caracteres).
+            </span>
+          </div>
+
+          <!-- Tipo -->
+          <div class="field">
+            <div class="field__label-row">
+              <label class="field__label" for="tipo">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+                Tipo de elección
+              </label>
+              <span class="field__required">REQUERIDO</span>
+            </div>
+            <div class="field__select-wrap">
+              <select
+                class="field__select"
+                [class.field__select--error]="tipo?.invalid && tipo?.touched"
+                id="tipo"
+                formControlName="tipo"
+              >
+                <option value="">— Seleccione el tipo de elección —</option>
+                <option value="CONGRESO">Elecciones de Congreso</option>
+                <option value="PRESIDENCIAL">Elecciones de Presidencia</option>
+                <option value="GOBERNADORES">Elecciones de Gobernadores</option>
+                <option value="ALCALDES">Elecciones de Alcaldes</option>
+                <option value="CONCEJOS">Elecciones de Concejos Municipales</option>
+                <option value="ASAMBLEA">Elecciones de Asambleas Departamentales</option>
+                <option value="JUNTAS">Elecciones de Juntas Administradoras Locales</option>
+              </select>
+              <svg
+                class="field__chevron"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            <span class="field__hint" *ngIf="!(tipo?.invalid && tipo?.touched)">
+              Seleccione el tipo de elección que corresponde a esta jornada electoral.
+            </span>
+            <span class="field__error" *ngIf="tipo?.invalid && tipo?.touched">
+              Debe seleccionar un tipo de elección.
+            </span>
+          </div>
+
+          <!-- Checkbox Obligatorio -->
+          <div class="field field--checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" class="checkbox-input" formControlName="listaAbierta" />
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">
+                <strong>Obligatorio</strong>
+                <span class="checkbox-desc">
+                  Marque si esta elección es obligatoria para todos los ciudadanos
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Fechas -->
+          <div class="field field--row">
+            <div class="field__col">
+              <div class="field__label-row">
+                <label class="field__label" for="fechaInicio">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Fecha inicio de elección
+                </label>
+                <span class="field__required">REQUERIDO</span>
+              </div>
+              <div class="field__input-wrap">
+                <input
+                  class="field__input"
+                  [class.field__input--error]="fechaInicio?.invalid && fechaInicio?.touched"
+                  id="fechaInicio"
+                  type="date"
+                  formControlName="fechaInicio"
+                  (change)="onFechaChange()"
+                />
+                <svg
+                  class="field__icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <span class="field__error" *ngIf="fechaInicio?.invalid && fechaInicio?.touched">
+                Seleccione la fecha de inicio.
+              </span>
+            </div>
+
+            <div class="field__col">
+              <div class="field__label-row">
+                <label class="field__label" for="fechaFinalizacion">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Fecha finalización de elección
+                </label>
+                <span class="field__required">REQUERIDO</span>
+              </div>
+              <div class="field__input-wrap">
+                <input
+                  class="field__input"
+                  [class.field__input--error]="
+                    fechaFinalizacion?.invalid && fechaFinalizacion?.touched
+                  "
+                  id="fechaFinalizacion"
+                  type="date"
+                  formControlName="fechaFinalizacion"
+                  (change)="onFechaChange()"
+                />
+                <svg
+                  class="field__icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <span
+                class="field__error"
+                *ngIf="fechaFinalizacion?.invalid && fechaFinalizacion?.touched"
+              >
+                Seleccione la fecha de finalización.
+              </span>
+              <span
+                class="field__error"
+                *ngIf="eleccionForm.errors?.['fechasInvalidas'] && fechaFinalizacion?.touched"
+              >
+                La fecha de finalización debe ser posterior a la de inicio.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Checkbox Voto por Urna -->
+          <div class="field field--checkbox">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                class="checkbox-input"
+                [(ngModel)]="votoUrna"
+                [ngModelOptions]="{ standalone: true }"
+                (change)="onVotoUrnaChange()"
+              />
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">
+                <strong>Voto por urna</strong>
+                <span class="checkbox-desc">
+                  Habilite si los ciudadanos pueden votar en urnas físicas
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <!-- Calendario Urna -->
+          <div class="field" *ngIf="votoUrna">
+            <div class="field__label-row">
+              <label class="field__label">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                Días habilitados para voto por urna
+              </label>
+              <span class="field__required">REQUERIDO SI ESTÁ HABILITADO</span>
+            </div>
+            <div class="calendar-picker">
+              <div class="calendar__header">
+                <button class="calendar__nav" (click)="prevMonth('urna')" type="button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span class="calendar__month-label">{{ getMonthLabel('urna') }}</span>
+                <button class="calendar__nav" (click)="nextMonth('urna')" type="button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <div class="calendar__weekdays">
+                <div *ngFor="let d of weekdays" class="calendar__weekday">{{ d }}</div>
+              </div>
+              <div class="calendar__days">
+                <div
+                  *ngFor="let day of calendarDaysUrna"
+                  class="calendar__day"
+                  [class.calendar__day--empty]="!day"
+                  [class.calendar__day--disabled]="day && !isInRange(day)"
+                  [class.calendar__day--selected]="day && isSelected(day, 'urna')"
+                  (click)="day && toggleDay(day, 'urna')"
+                >
+                  {{ day?.getDate() || '' }}
+                </div>
+              </div>
+            </div>
+            <span class="field__hint">
+              Seleccione los días en los que estará habilitado el voto por urna.
+            </span>
+            <span class="field__error" *ngIf="errorUrna">{{ errorUrna }}</span>
+            <div class="selected-days" *ngIf="selectedUrnaDays.length > 0">
+              <span class="selected-days__label">DÍAS SELECCIONADOS:</span>
+              <div class="selected-days__list">
+                <span class="selected-day" *ngFor="let d of selectedUrnaDays">
+                  {{ formatDay(d) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Checkbox Voto por Domicilio -->
+          <div class="field field--checkbox">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                class="checkbox-input"
+                [(ngModel)]="votoDomicilio"
+                [ngModelOptions]="{ standalone: true }"
+                (change)="onVotoDomicilioChange()"
+              />
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">
+                <strong>Voto por domicilio</strong>
+                <span class="checkbox-desc">
+                  Habilite si los ciudadanos pueden votar desde sus domicilios
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <!-- Calendario Domicilio -->
+          <div class="field" *ngIf="votoDomicilio">
+            <div class="field__label-row">
+              <label class="field__label">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                Días habilitados para voto por domicilio
+              </label>
+              <span class="field__required">REQUERIDO SI ESTÁ HABILITADO</span>
+            </div>
+            <div class="calendar-picker">
+              <div class="calendar__header">
+                <button class="calendar__nav" (click)="prevMonth('domicilio')" type="button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span class="calendar__month-label">{{ getMonthLabel('domicilio') }}</span>
+                <button class="calendar__nav" (click)="nextMonth('domicilio')" type="button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <div class="calendar__weekdays">
+                <div *ngFor="let d of weekdays" class="calendar__weekday">{{ d }}</div>
+              </div>
+              <div class="calendar__days">
+                <div
+                  *ngFor="let day of calendarDaysDomicilio"
+                  class="calendar__day"
+                  [class.calendar__day--empty]="!day"
+                  [class.calendar__day--disabled]="day && !isInRange(day)"
+                  [class.calendar__day--selected]="day && isSelected(day, 'domicilio')"
+                  (click)="day && toggleDay(day, 'domicilio')"
+                >
+                  {{ day?.getDate() || '' }}
+                </div>
+              </div>
+            </div>
+            <span class="field__hint">
+              Seleccione los días habilitados para voto por domicilio. Aplica principalmente para
+              adultos mayores.
+            </span>
+            <span class="field__error" *ngIf="errorDomicilio">{{ errorDomicilio }}</span>
+            <div class="selected-days" *ngIf="selectedDomicilioDays.length > 0">
+              <span class="selected-days__label">DÍAS SELECCIONADOS:</span>
+              <div class="selected-days__list">
+                <span class="selected-day" *ngFor="let d of selectedDomicilioDays">
+                  {{ formatDay(d) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Botón crear -->
+          <div class="form-actions">
+            <button class="btn-submit" (click)="onSubmit()" [disabled]="loading" type="button">
+              <svg
+                *ngIf="!loading"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span class="btn-submit__spinner" *ngIf="loading"></span>
+              {{ loading ? 'Creando elección...' : 'Crear elección' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="summary-card" *ngIf="showSummary">
+        <div class="summary-card__header">
+          <div class="summary-card__icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="summary-card__title">Resumen de la jornada electoral</h3>
+            <p class="summary-card__sub">
+              Verificación de los datos antes de su creación en el sistema.
+            </p>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-item__label">NOMBRE</div>
+            <div class="summary-item__value">{{ summary.nombre }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item__label">TIPO</div>
+            <div class="summary-item__value">{{ summary.tipo }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item__label">CARÁCTER</div>
+            <div class="summary-item__value">{{ summary.caracter }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item__label">FECHAS</div>
+            <div class="summary-item__value">{{ summary.fechas }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item__label">VOTO POR URNA</div>
+            <div class="summary-item__value">{{ summary.urna }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item__label">VOTO POR DOMICILIO</div>
+            <div class="summary-item__value">{{ summary.domicilio }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-card__header">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h4>¿Cómo funciona?</h4>
+        </div>
+        <ol class="sidebar-card__steps">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <strong>Nombre descriptivo</strong>
+              <p>Asigne un nombre claro para identificar la jornada electoral en el sistema.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <strong>Seleccione el tipo</strong>
+              <p>Escoja el tipo de elección (congreso, presidencia, alcaldes, etc.).</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              <strong>Configure fechas y modalidades</strong>
+              <p>Establezca el período electoral y las modalidades de votación disponibles.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-num step-num--gold">4</span>
+            <div>
+              <strong>Crear elección</strong>
+              <p>
+                El sistema validará los datos automáticamente y la elección quedará lista para usar.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="sidebar-card sidebar-card--help">
+        <div class="sidebar-card__header">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"
+            />
+          </svg>
+          <h4>¿Necesita ayuda?</h4>
+        </div>
+        <p class="sidebar-card__help-text">
+          Línea de soporte técnico disponible de 7:00 a.m. a 6:00 p.m.
+        </p>
+        <a href="tel:018000116034" class="sidebar-card__phone">01 8000 11 60 34</a>
+      </div>
+    </aside>
+  </div>
+</main>
