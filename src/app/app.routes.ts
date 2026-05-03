@@ -17,9 +17,15 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./features/auth/pages/login/login.component').then(m => m.LoginComponent),
+      import('./features/auth/pages/login/login.component').then((m) => m.LoginComponent),
   },
-  
+  /**
+   * PARTIDOS
+   */
+  {
+    path: 'partidos',
+    loadChildren: () => import('./features/partido/partido.module').then((m) => m.PartidoModule),
+  },
   /**
    * CANDIDATOS
    */
