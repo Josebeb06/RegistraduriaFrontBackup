@@ -21,6 +21,108 @@ Ambos frontends comparten el mismo VM. El acceso externo usa **Cloudflare Quick 
 
 ---
 
+## Ejecución Local
+
+> Para probar la aplicación completa sin acceso a los VMs de producción.
+
+### Opción A — Full Docker (un solo comando, recomendado)
+
+El `docker-compose.yml` de la **raíz del workspace** levanta toda la infraestructura local en un solo paso:
+
+```bash
+# Desde la carpeta raíz ("Arquitectura de Software")
+docker compose up -d
+```
+
+| Servicio | URL local | Nota |
+|----------|-----------|------|
+| **RegistraduriaFront** | http://localhost:4200 | nginx sirve el build Angular |
+| VotacionFront | http://localhost:4201 | |
+| RegistraduriaBack | http://localhost:**8082** | ⚠ Puerto 8082, no 8080 |
+| VotacionBack | http://localhost:8081 | |
+| PostgreSQL | localhost:5432 | DB: `vote4tech`, user: `postgres`, pass: `postgres123` |
+| CouchDB | localhost:5984 | user: `admin`, pass: `admin123` |
+
+> Las credenciales de BD son **distintas** a producción (`vote4tech`/`postgres`/`postgres123` en local vs. `bd_nacional_vote4tech`/`admin_db_nacional`/`12345` en producción). El seed de datos se ejecuta automáticamente al iniciar los backends por primera vez (si las tablas están vacías).
+
+Para ver los logs de este servicio en local:
+
+```bash
+docker compose logs -f registraduria-front
+```
+
+Para parar todo:
+
+```bash
+docker compose down
+# Para borrar también los volúmenes de BD (reset completo):
+docker compose down -v
+```
+
+---
+
+### Opción B — `ng serve` con hot reload
+
+Útil para desarrollo Angular: los cambios de código se reflejan en el navegador al instante sin reconstruir la imagen Docker.
+
+**Paso 1 — Levantar solo DBs y backend con Docker:**
+
+```bash
+# Desde la carpeta raíz del workspace
+docker compose up -d postgres registraduria-back
+```
+
+RegistraduriaBack queda disponible en `http://localhost:8082`.
+
+**Paso 2 — El archivo `proxy.conf.local.json` ya existe** en la raíz de este proyecto con el siguiente contenido:
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
+```
+
+> El `pathRewrite` es **obligatorio**: los controllers del backend no tienen prefijo `/api`
+> (`@RequestMapping("/registrador")`, `@RequestMapping("/eleccion")`, etc.).
+> El proxy debe eliminar ese prefijo antes de reenviar la petición.
+>
+> El `proxy.conf.json` original **no se toca** — apunta al VM de producción
+> (`10.43.100.131:8080`) y sirve para conectar el `ng serve` al backend del VM directamente.
+
+**Paso 3 — Instalar dependencias y arrancar Angular:**
+
+```bash
+cd Vote4TechRegistraduriaFront
+npm install
+ng serve --proxy-config proxy.conf.local.json
+```
+
+Abre http://localhost:4200.
+
+> ⚠ El flag `--proxy-config proxy.conf.local.json` es **obligatorio**.
+> El archivo `angular.json` de este proyecto **no tiene** `proxyConfig` configurado
+> en la sección `serve`, por lo que Angular no sabe que debe usar el proxy
+> a menos que se pase explícitamente por línea de comandos.
+> Sin ese flag, todas las llamadas a `/api` fallan con error de red (CORS o conexión rechazada).
+
+**Alternativa — conectar `ng serve` directamente al VM de producción:**
+
+Si el VM `10.43.100.131` es accesible desde tu máquina, puedes usar el proxy original sin cambios:
+
+```bash
+ng serve --proxy-config proxy.conf.json
+```
+
+---
+
 ## Archivos con Fixes Críticos
 
 > Estos archivos tienen correcciones obligatorias que **no están en el repositorio Git**. Deben copiarse manualmente con `scp` después de clonar. Sin ellos el login no funciona.
