@@ -7,6 +7,8 @@
 # Para ver la URL publica generada:
 #   docker logs vote4tech-cloudflared
 
+name: vote4tech-registraduria
+
 services:
   frontend:
     build:
