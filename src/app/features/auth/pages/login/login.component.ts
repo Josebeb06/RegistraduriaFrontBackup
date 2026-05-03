@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthStateService } from '../../../../shared/services/auth-state.service';
 import { ToastComponent } from '../../../../shared/components/toast/toast.component';
 
 @Component({
@@ -15,6 +15,7 @@ import { ToastComponent } from '../../../../shared/components/toast/toast.compon
 export class LoginComponent {
   usuario = '';
   password = '';
+  tipoUsuario: 'registrador' | 'consejo' | 'admin' = 'registrador';
 
   loading = false;
 
@@ -24,7 +25,7 @@ export class LoginComponent {
   showToast = false;
 
   constructor(
-    private authService: AuthService,
+    private authService: AuthStateService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -37,32 +38,47 @@ export class LoginComponent {
 
     this.loading = true;
 
-    this.authService
-      .login({
-        usuario: this.usuario,
-        password: this.password,
-      })
-      .subscribe({
-        next: (res) => {
-          // Guardar sesión básica (temporal)
-          localStorage.setItem('user', JSON.stringify(res));
-          window.dispatchEvent(new Event('authChange'));
+    let loginObservable;
 
-          this.showSuccess('Inicio de sesión exitoso');
+    if (this.tipoUsuario === 'registrador') {
+      loginObservable = this.authService.loginRegistrador(this.usuario, this.password);
+    } else if (this.tipoUsuario === 'consejo') {
+      loginObservable = this.authService.loginConsejoNacional(this.usuario, this.password);
+    } else if (this.tipoUsuario === 'admin') {
+      loginObservable = this.authService.loginAdministrador(this.usuario, this.password);
+    }
 
-          setTimeout(() => {
-            this.router.navigate(['/']); // o dashboard
-          }, 1000);
+    loginObservable!.subscribe({
+      next: () => {
+        this.showSuccess(`Inicio de sesión exitoso como ${this.tipoUsuario}`);
 
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.showError('Credenciales incorrectas');
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-      });
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1000);
+
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error en login:', err);
+        
+        let errorMessage = 'Error desconocido';
+        
+        if (err.status === 401) {
+          errorMessage = 'Credenciales incorrectas';
+        } else if (err.status === 400) {
+          errorMessage = 'Datos inválidos. Verifique usuario y contraseña';
+        } else if (err.status === 500) {
+          errorMessage = 'Error del servidor. Intente más tarde';
+        } else if (err.status === 0) {
+          errorMessage = 'No se puede conectar al servidor';
+        }
+        
+        this.showError(errorMessage);
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   private showSuccess(msg: string) {
