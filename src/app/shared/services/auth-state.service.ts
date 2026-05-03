@@ -51,9 +51,7 @@ export class AuthStateService {
 
   loginRegistrador(usuario: string, password: string): Observable<any> {
     return this.http
-      .post(`${this.apiUrl}/registrador/login`, { usuario, password }, {
-        responseType: 'text'
-      })
+      .post(`${this.apiUrl}/registrador/login`, { usuario, password }, { responseType: 'text' })
       .pipe(
         tap((token: string) => {
           if (token && token.length > 0) {
@@ -67,9 +65,7 @@ export class AuthStateService {
 
   loginConsejoNacional(username: string, password: string): Observable<any> {
     return this.http
-      .post(`${this.apiUrl}/consejo-nacional/login`, { username, password }, {
-        responseType: 'text'
-      })
+      .post(`${this.apiUrl}/consejo-nacional/login`, { username, password }, { responseType: 'text' })
       .pipe(
         tap((token: string) => {
           if (token && token.length > 0) {
@@ -86,9 +82,7 @@ export class AuthStateService {
       .post(`${this.apiUrl}/administrador-electoral/login`, {
         usuario,
         password,
-      }, {
-        responseType: 'text'
-      })
+      }, { responseType: 'text' })
       .pipe(
         tap((token: string) => {
           if (token && token.length > 0) {
