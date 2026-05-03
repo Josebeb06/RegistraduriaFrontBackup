@@ -1,53 +1,76 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthStateService } from '../../services/auth-state.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
+  styleUrl: './header.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
+  isAuthenticated = false;
+  userName: string | null = null;
+  userType: string | null = null;
+  private subscription: Subscription | null = null;
+  private authChangeHandler: (() => void) | null = null; 
 
-  menuOpen = false;
-  isLogged = false;
+  constructor(
+    private authService: AuthStateService,
+    private router: Router,
+    private cdr: ChangeDetectorRef, 
+  ) {}
 
-  constructor(private router: Router) {}
-
-  ngOnInit(): void {
-    this.checkSession();
-
-    // Escuchar cambios de login
-    window.addEventListener('authChange', () => {
-      this.checkSession();
+  ngOnInit() {
+    this.subscription = this.authService.user$.subscribe((user) => {
+      this.isAuthenticated = !!user;
+      this.userName = user?.usuario || user?.username || null;
+      this.userType = user?.tipo || null;
+      this.cdr.markForCheck();
     });
+
+    this.authChangeHandler = () => this.updateAuthState();
+    window.addEventListener('authChange', this.authChangeHandler);
   }
 
-  checkSession() {
-    const user = localStorage.getItem('user');
-    this.isLogged = !!user;
-  }
-
-  handleAuthAction() {
-    if (this.isLogged) {
-      // 🔴 LOGOUT
-      localStorage.removeItem('user');
-      this.isLogged = false;
-
-      this.router.navigateByUrl('/');
-    } else {
-      // 🟢 LOGIN
-      this.router.navigateByUrl('/login');
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+    if (this.authChangeHandler) {
+      window.removeEventListener('authChange', this.authChangeHandler);
     }
   }
 
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
+  private updateAuthState() {
+    const user = this.authService.currentUser();
+    this.isAuthenticated = !!user;
+    this.userName = user?.usuario || user?.username || null;
+    this.userType = user?.tipo || null;
+    this.cdr.markForCheck(); 
   }
 
-  closeMenu(): void {
-    this.menuOpen = false;
+  onLogout() {
+    if (confirm('¿Desea cerrar sesión?')) {
+      this.authService.logout();
+      this.router.navigate(['/login']);
+    }
+  }
+
+  getTypeLabel(): string {
+    switch (this.userType) {
+      case 'registrador':
+        return 'Registrador';
+      case 'consejo':
+        return 'Consejo Nacional';
+      case 'admin':
+        return 'Administrador Electoral';
+      default:
+        return 'Usuario';
+    }
   }
 }
