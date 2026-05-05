@@ -3,43 +3,42 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+export interface CreateEleccionDTO {
+  nombre: string;
+  fechaInicio: string; // format: date-time → "2026-05-04T00:00:00"
+  fechaFinalizacion: string; // format: date-time
+  fechaInicioUrna?: string; // opcional, solo si voto por urna
+  fechaFinalizacionUrna?: string;
+  fechaInicioDomicilio?: string; // opcional, solo si voto por domicilio
+  fechaFinalizacionDomicilio?: string;
+  tipo: string; // enum: CONGRESO | PRESIDENCIAL | GOBERNADORES | etc.
+  listaAbierta: boolean;
+  idAdministradorElectoral: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class EleccionService {
-  /**
-   * IMPORTANTE: URL relativa para que Nginx (API Gateway) enrute al backend.
-   * Nginx en la VM front (10.43.97.237) hace proxy de /api/* → 10.43.100.131:8080
-   */
+  // Nginx hace proxy /api/* → backend en 10.43.100.131:8080
   private apiUrl = '/api/eleccion';
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Crear elección
-   */
-  crearEleccion(data: any) {
-    return this.http.post(`${this.apiUrl}/add`, data).pipe(
-      catchError((error) => {
-        console.error('Error HTTP:', error);
-        return throwError(() => error);
-      }),
-    );
+  crearEleccion(data: CreateEleccionDTO): Observable<any> {
+    return this.http.post(`${this.apiUrl}/add`, data).pipe(catchError(this.handleError));
   }
 
-  /**
-   * Obtener elecciones
-   */
   obtenerElecciones(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/elecciones`).pipe(catchError(this.handleError));
   }
 
-  /**
-   * Manejo de errores
-   */
+  obtenerEleccionById(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`).pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
     console.error('Error en EleccionService:', error);
-
-    return throwError(() => new Error('Error en la petición'));
+    return throwError(() => error);
   }
 }

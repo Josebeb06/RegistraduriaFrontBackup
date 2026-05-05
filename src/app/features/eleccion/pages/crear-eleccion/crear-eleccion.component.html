@@ -454,7 +454,7 @@
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                Días habilitados para voto por urna
+                Rango de fechas para voto por urna
               </label>
               <span class="field__required">REQUERIDO SI ESTÁ HABILITADO</span>
             </div>
@@ -493,7 +493,9 @@
                   class="calendar__day"
                   [class.calendar__day--empty]="!day"
                   [class.calendar__day--disabled]="day && !isInRange(day)"
-                  [class.calendar__day--selected]="day && isSelected(day, 'urna')"
+                  [class.calendar__day--range-start]="day && isRangeStart(day, 'urna')"
+                  [class.calendar__day--range-end]="day && isRangeEnd(day, 'urna')"
+                  [class.calendar__day--in-range]="day && isInSelectedRange(day, 'urna')"
                   (click)="day && toggleDay(day, 'urna')"
                 >
                   {{ day?.getDate() || '' }}
@@ -501,15 +503,17 @@
               </div>
             </div>
             <span class="field__hint">
-              Seleccione los días en los que estará habilitado el voto por urna.
+              Haga click en el día de inicio y luego en el día de fin del período habilitado para
+              voto por urna.
             </span>
             <span class="field__error" *ngIf="errorUrna">{{ errorUrna }}</span>
-            <div class="selected-days" *ngIf="selectedUrnaDays.length > 0">
-              <span class="selected-days__label">DÍAS SELECCIONADOS:</span>
+            <div class="selected-days" *ngIf="fechaInicioUrna">
+              <span class="selected-days__label">RANGO SELECCIONADO:</span>
               <div class="selected-days__list">
-                <span class="selected-day" *ngFor="let d of selectedUrnaDays">
-                  {{ formatDay(d) }}
-                </span>
+                <span class="selected-day">{{ formatDay(fechaInicioUrna) }}</span>
+                <span class="selected-day" *ngIf="fechaFinUrna"
+                  >→ {{ formatDay(fechaFinUrna) }}</span
+                >
               </div>
             </div>
           </div>
@@ -553,7 +557,7 @@
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                Días habilitados para voto por domicilio
+                Rango de fechas para voto por domicilio
               </label>
               <span class="field__required">REQUERIDO SI ESTÁ HABILITADO</span>
             </div>
@@ -592,7 +596,9 @@
                   class="calendar__day"
                   [class.calendar__day--empty]="!day"
                   [class.calendar__day--disabled]="day && !isInRange(day)"
-                  [class.calendar__day--selected]="day && isSelected(day, 'domicilio')"
+                  [class.calendar__day--range-start]="day && isRangeStart(day, 'domicilio')"
+                  [class.calendar__day--range-end]="day && isRangeEnd(day, 'domicilio')"
+                  [class.calendar__day--in-range]="day && isInSelectedRange(day, 'domicilio')"
                   (click)="day && toggleDay(day, 'domicilio')"
                 >
                   {{ day?.getDate() || '' }}
@@ -600,16 +606,17 @@
               </div>
             </div>
             <span class="field__hint">
-              Seleccione los días habilitados para voto por domicilio. Aplica principalmente para
-              adultos mayores.
+              Haga click en el día de inicio y luego en el día de fin del período habilitado para
+              voto por domicilio. Aplica principalmente para adultos mayores.
             </span>
             <span class="field__error" *ngIf="errorDomicilio">{{ errorDomicilio }}</span>
-            <div class="selected-days" *ngIf="selectedDomicilioDays.length > 0">
-              <span class="selected-days__label">DÍAS SELECCIONADOS:</span>
+            <div class="selected-days" *ngIf="fechaInicioDomicilio">
+              <span class="selected-days__label">RANGO SELECCIONADO:</span>
               <div class="selected-days__list">
-                <span class="selected-day" *ngFor="let d of selectedDomicilioDays">
-                  {{ formatDay(d) }}
-                </span>
+                <span class="selected-day">{{ formatDay(fechaInicioDomicilio) }}</span>
+                <span class="selected-day" *ngIf="fechaFinDomicilio"
+                  >→ {{ formatDay(fechaFinDomicilio) }}</span
+                >
               </div>
             </div>
           </div>

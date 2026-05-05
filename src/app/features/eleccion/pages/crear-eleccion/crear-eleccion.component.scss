@@ -573,6 +573,20 @@
       background: var(--navy);
     }
   }
+
+  &--range-start,
+  &--range-end {
+    background: var(--navy-mid);
+    color: var(--white);
+    font-weight: 700;
+    border-color: var(--navy-mid);
+  }
+
+  &--in-range {
+    background: rgba(22, 58, 107, 0.12);
+    color: var(--navy);
+    border-radius: 0;
+  }
 }
 
 // ─── SELECTED DAYS ────────────────────────────────────────────────────────────
