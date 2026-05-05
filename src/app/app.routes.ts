@@ -55,6 +55,15 @@ export const routes: Routes = [
   },
 
   /**
+   * Cambio de Centro
+   */
+  {
+    path: 'cambio-centro',
+    loadChildren: () =>
+      import('./features/cambio-centro/cambio-centro.module').then((m) => m.CambioCentroModule),
+  },
+
+  /**
    * RUTA FALLBACK (si escriben mal la URL)
    */
   {
