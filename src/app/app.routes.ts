@@ -31,6 +31,15 @@ export const routes: Routes = [
   },
 
   /**
+   * PARTIDOS
+   */
+  {
+    path: 'partidos',
+    loadChildren: () => import('./features/partido/partido.module').then((m) => m.PartidoModule),
+    canActivate: [AuthGuard], // ← PROTEGIDA
+  },
+
+  /**
    * ELECCIONES
    */
   {
@@ -45,6 +54,16 @@ export const routes: Routes = [
   {
     path: 'jurado',
     loadChildren: () => import('./features/jurado/jurado.module').then((m) => m.JuradoModule),
+    canActivate: [AuthGuard], // ← PROTEGIDA
+  },
+
+  /**
+   * cambio de centro
+   */
+  {
+    path: 'cambio-centro',
+    loadChildren: () =>
+      import('./features/cambio-centro/cambio-centro.module').then((m) => m.CambioCentroModule),
     canActivate: [AuthGuard], // ← PROTEGIDA
   },
 
