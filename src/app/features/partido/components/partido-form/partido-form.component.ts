@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -13,10 +13,8 @@ export class PartidoFormComponent {
   @Output() formSubmit = new EventEmitter<any>();
 
   partidoForm: FormGroup;
-
   archivos: any = {};
 
-  // 📁 5 archivos EXACTOS del mockup
   fileTypes = [
     { key: 'logo', label: 'Logosímbolo' },
     { key: 'estatutos', label: 'Estatutos' },
@@ -25,14 +23,16 @@ export class PartidoFormComponent {
     { key: 'certificado', label: 'Certificado de representatividad electoral' },
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+  ) {
     this.partidoForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       sigla: ['', Validators.required],
     });
   }
 
-  // 📁 SUBIR PDF
   onFileChange(event: any, tipo: string) {
     const file = event.target.files[0];
     if (!file) return;
@@ -43,29 +43,23 @@ export class PartidoFormComponent {
       return;
     }
 
-    this.archivos = {
-      ...this.archivos,
-      [tipo]: {
-        file,
-        name: file.name,
-      },
-    };
+    this.archivos = { ...this.archivos, [tipo]: { file, name: file.name } };
+    this.cdr.detectChanges();
   }
 
-  // ❌ ELIMINAR
   removeFile(tipo: string) {
     delete this.archivos[tipo];
+    this.cdr.detectChanges();
   }
 
-  // 📤 SUBMIT
   onSubmit() {
     if (this.partidoForm.invalid) {
       this.partidoForm.markAllAsTouched();
+      this.cdr.detectChanges();
       return;
     }
 
     const faltantes = this.fileTypes.filter((f) => !this.archivos[f.key]);
-
     if (faltantes.length > 0) {
       alert('Debes subir todos los documentos requeridos');
       return;
@@ -73,13 +67,21 @@ export class PartidoFormComponent {
 
     const formData = new FormData();
 
-    Object.entries(this.partidoForm.value).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
+    // ✅ JSON como Blob con Content-Type application/json
+    const data = {
+      nombre: this.partidoForm.value.nombre,
+      sigla: this.partidoForm.value.sigla,
+      idRegistrador: 1, // ajustar cuando haya sesión real
+    };
 
-    Object.keys(this.archivos).forEach((key) => {
-      formData.append(key, this.archivos[key].file);
-    });
+    formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
+    // ✅ Claves exactas del OpenAPI y el script .sh
+    formData.append('logo', this.archivos['logo'].file);
+    formData.append('estatutos', this.archivos['estatutos'].file);
+    formData.append('plataforma', this.archivos['plataforma'].file);
+    formData.append('registro', this.archivos['registro'].file);
+    formData.append('certificado', this.archivos['certificado'].file);
 
     this.formSubmit.emit(formData);
   }
@@ -87,6 +89,7 @@ export class PartidoFormComponent {
   resetForm() {
     this.partidoForm.reset();
     this.archivos = {};
+    this.cdr.detectChanges();
   }
 
   goBack() {
