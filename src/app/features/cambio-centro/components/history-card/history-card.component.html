@@ -1,0 +1,62 @@
+<div class="history-card" *ngIf="visible">
+  <!-- Header -->
+  <div class="history-card__header">
+    <div class="history-card__icon">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+        />
+      </svg>
+    </div>
+
+    <div>
+      <h3 class="history-card__title">Registro de la operación</h3>
+      <p class="history-card__sub">
+        Este cambio quedará registrado en el log de auditoría institucional.
+      </p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="history-table">
+    <!-- Head -->
+    <div class="history-table__row history-table__row--head">
+      <span>Campo</span>
+      <span>Valor anterior</span>
+      <span>Valor nuevo</span>
+    </div>
+
+    <!-- Rows -->
+    <div class="history-table__row">
+      <span class="history-table__field">Ciudadano</span>
+      <span>{{ nameOld }}</span>
+      <span>{{ nameNew }}</span>
+    </div>
+
+    <div class="history-table__row">
+      <span class="history-table__field">Centro de votación</span>
+      <span>{{ centerOld }}</span>
+      <span class="history-table__new">{{ centerNew }}</span>
+    </div>
+
+    <div class="history-table__row">
+      <span class="history-table__field">Operador</span>
+      <span>—</span>
+      <span>{{ operator }}</span>
+    </div>
+
+    <div class="history-table__row">
+      <span class="history-table__field">Fecha / Hora</span>
+      <span>—</span>
+      <span>{{ timestamp }}</span>
+    </div>
+  </div>
+</div>
