@@ -6,8 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class PartidoService {
-  private API_URL = 'http://localhost:8080/api/partidos';
-
+  private apiUrl = 'https://sessions-mobility-buffalo-downloaded.trycloudflare.com/partido';
   constructor(private http: HttpClient) {}
 
   crearPartido(data: any): Observable<any> {
