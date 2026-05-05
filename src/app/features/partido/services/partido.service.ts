@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class PartidoService {
-  private apiUrl = '/api/partido';
+  private apiUrl = 'http://10.43.100.131:8080/partido';
 
   constructor(private http: HttpClient) {}
 

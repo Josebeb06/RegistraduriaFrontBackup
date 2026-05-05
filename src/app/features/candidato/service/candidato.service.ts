@@ -18,8 +18,7 @@ import { throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class CandidatoService {
-  private apiUrl = 'https://sessions-mobility-buffalo-downloaded.trycloudflare.com/candidato';
-
+  private apiUrl = 'http://10.43.100.131:8080/candidato';
   constructor(private http: HttpClient) {}
 
   /**
