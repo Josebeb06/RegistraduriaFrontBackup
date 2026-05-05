@@ -99,14 +99,13 @@ export class CandidatoFormComponent {
     delete this.archivos[tipo];
   }
 
-  // 📤 Envío del formulario
+  //Enviar formulario
   onSubmit() {
     if (this.candidatoForm.invalid) {
       this.candidatoForm.markAllAsTouched();
       return;
     }
 
-    // ⚠️ Validar archivos obligatorios
     const faltantes = this.fileTypes.filter((f) => !this.archivos[f.key]);
 
     if (faltantes.length > 0) {
@@ -116,16 +115,26 @@ export class CandidatoFormComponent {
 
     const formData = new FormData();
 
-    // 📦 Datos del formulario
-    Object.entries(this.candidatoForm.value).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
+    // ✅ 1. CREAR JSON COMO EL BACK LO ESPERA
+    const data = {
+      nombre: this.candidatoForm.value.nombre,
+      organizacion: this.candidatoForm.value.organizacion,
+      eleccion: this.candidatoForm.value.eleccion,
+      cargo: this.candidatoForm.value.cargo,
+      idRegistrador: 1, // 🔥 IMPORTANTE (igual que el .sh)
+    };
 
-    // 📁 Archivos
-    Object.keys(this.archivos).forEach((key) => {
-      formData.append(key, this.archivos[key].file);
-    });
+    // ✅ 2. ENVIAR JSON COMO STRING
+    formData.append('data', JSON.stringify(data));
 
+    // ✅ 3. ENVIAR ARCHIVOS (CLAVES QUE ESPERA EL BACK)
+    formData.append('foto', this.archivos['foto'].file);
+    formData.append('e6', this.archivos['e6'].file);
+    formData.append('certificado', this.archivos['cert'].file);
+    formData.append('cedula', this.archivos['cedula'].file);
+    formData.append('aval', this.archivos['aval'].file);
+
+    // 🚀 enviar
     this.formSubmit.emit(formData);
   }
 

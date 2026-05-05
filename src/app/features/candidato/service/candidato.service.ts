@@ -18,7 +18,7 @@ import { throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class CandidatoService {
-  private apiUrl = '/api/candidato';
+  private apiUrl = 'http://10.43.100.131:8080/candidato';
 
   constructor(private http: HttpClient) {}
 
@@ -34,12 +34,20 @@ export class CandidatoService {
    * Crear candidato
    * POST /candidato/add
    */
-  createCandidato(data: any) {
-    return this.http.post(`${this.apiUrl}/add`, data).pipe(
-      catchError((error) => {
-        console.error('Error HTTP:', error);
-        return throwError(() => error);
-      }),
-    );
+  createCandidato(data: FormData) {
+    const token = localStorage.getItem('authToken');
+
+    return this.http
+      .post(`${this.apiUrl}/add`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error HTTP:', error);
+          return throwError(() => error);
+        }),
+      );
   }
 }
