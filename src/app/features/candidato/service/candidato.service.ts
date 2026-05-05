@@ -39,9 +39,7 @@ export class CandidatoService {
 
     return this.http
       .post(`${this.apiUrl}/add`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
       .pipe(
         catchError((error) => {

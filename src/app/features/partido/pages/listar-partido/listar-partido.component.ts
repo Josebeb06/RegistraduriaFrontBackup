@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { PartidoService } from '../../services/partido.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-listar-partido',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './listar-partido.component.html',
   styleUrls: ['./listar-partido.component.scss'],
 })
