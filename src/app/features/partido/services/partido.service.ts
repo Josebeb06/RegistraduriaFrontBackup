@@ -6,25 +6,25 @@ import { catchError } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root',
 })
-export class CandidatoService {
+export class PartidoService {
   // Relativo → nginx hace proxy /api/* → backend
-  private apiUrl = '/api/candidato';
+  private apiUrl = '/api/partido';
 
   constructor(private http: HttpClient) {}
 
-  getCandidatos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/candidatos`).pipe(
+  crearPartido(data: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/add`, data).pipe(
       catchError((error) => {
-        console.error('Error getCandidatos:', error);
+        console.error('Error crearPartido:', error);
         return throwError(() => error);
       }),
     );
   }
 
-  createCandidato(data: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/add`, data).pipe(
+  listarPartidos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/partidos`).pipe(
       catchError((error) => {
-        console.error('Error createCandidato:', error);
+        console.error('Error listarPartidos:', error);
         return throwError(() => error);
       }),
     );

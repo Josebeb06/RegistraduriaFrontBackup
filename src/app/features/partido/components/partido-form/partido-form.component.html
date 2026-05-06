@@ -1,34 +1,17 @@
-<form [formGroup]="candidatoForm" (ngSubmit)="onSubmit()" class="canvas">
+<form [formGroup]="partidoForm" (ngSubmit)="onSubmit()" class="canvas">
   <!-- NAVBAR -->
   <div class="navbar">
-    <!-- BOTÓN VOLVER -->
     <button type="button" class="back-btn" (click)="goBack()">← Volver</button>
-
-    <span class="navbar-title">Registro de Candidatos</span>
+    <span class="navbar-title">Registro de Partido</span>
   </div>
 
   <div class="form-container">
-    <!-- CAMPOS -->
-    <label>NOMBRE CANDIDATO</label>
+    <!-- CAMPO -->
+    <label>NOMBRE ORGANIZACIÓN POLÍTICA</label>
     <input type="text" formControlName="nombre" />
 
-    <label>ORGANIZACIÓN POLÍTICA</label>
-    <select formControlName="organizacion">
-      <option value="">Seleccione</option>
-      <option *ngFor="let org of organizaciones">{{ org }}</option>
-    </select>
-
-    <label>ELECCIÓN</label>
-    <select formControlName="eleccion" (change)="onEleccionChange()">
-      <option value="">Seleccione</option>
-      <option *ngFor="let e of elecciones">{{ e }}</option>
-    </select>
-
-    <label>CARGO</label>
-    <select formControlName="cargo" [disabled]="!cargosDisponibles.length">
-      <option value="">Seleccione</option>
-      <option *ngFor="let c of cargosDisponibles">{{ c }}</option>
-    </select>
+    <label>SIGLA</label>
+    <input type="text" formControlName="sigla" />
 
     <!-- ARCHIVOS -->
     <div class="files-section">
@@ -71,7 +54,6 @@
       </div>
     </div>
 
-    <!-- BOTÓN -->
     <button type="submit" class="submit-btn">Solicitar aprobación</button>
   </div>
 </form>

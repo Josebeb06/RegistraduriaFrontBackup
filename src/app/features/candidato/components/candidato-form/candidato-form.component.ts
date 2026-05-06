@@ -1,24 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
-/**
- * Componente reutilizable: Formulario de Candidato
- *
- * Responsabilidad:
- * - Capturar datos del candidato
- * - Validar inputs
- * - Emitir datos al componente padre (page)
- *
- * DTO BACKEND (CreateCandidatoDTO):
- * {
- *   nombre: string,
- *   numero: string,
- *   fotoUrl: string,
- *   partidoLogoUrl: string,
- *   idRegistrador: number
- * }
- */
 @Component({
   selector: 'app-candidato-form',
   standalone: true,
@@ -30,52 +13,126 @@ export class CandidatoFormComponent {
   @Output() formSubmit = new EventEmitter<any>();
 
   candidatoForm: FormGroup;
+  archivos: any = {};
 
-  constructor(private fb: FormBuilder) {
+  fileTypes = [
+    { key: 'foto', label: 'Fotografía' },
+    { key: 'e6', label: 'Formulario E-6' },
+    { key: 'cert', label: 'Certificado Consejo de Estado' },
+    { key: 'cedula', label: 'Fotocopia Cédula' },
+    { key: 'aval', label: 'Aval' },
+  ];
+
+  organizaciones = ['Partido Liberal', 'Partido Conservador', 'Partido Verde', 'Cambio Radical'];
+
+  elecciones = [
+    'Presidenciales',
+    'Legislativas',
+    'Locales y Regionales',
+    'Consultas',
+    'Especiales',
+  ];
+
+  cargosMap: any = {
+    Presidenciales: ['Presidente'],
+    Legislativas: ['Senador', 'Representante'],
+    'Locales y Regionales': ['Gobernador', 'Alcalde', 'Consejero Local'],
+    Consultas: ['Precandidato', 'Directivo Partido'],
+    Especiales: ['Consejero Juventud', 'Autoridad Indígena'],
+  };
+
+  cargosDisponibles: string[] = [];
+
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+  ) {
     this.candidatoForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
-      numero: ['', [Validators.required]],
-      fotoUrl: ['', [Validators.required]],
-      partidoLogoUrl: ['', [Validators.required]],
-      idRegistrador: [1, [Validators.required]], // 🔹 Temporal (luego dinámico)
+      organizacion: ['', Validators.required],
+      eleccion: ['', Validators.required],
+      cargo: ['', Validators.required],
     });
   }
 
-  // 🔹 Getters para validaciones en HTML
-  get nombre() {
-    return this.candidatoForm.get('nombre');
-  }
-  get numero() {
-    return this.candidatoForm.get('numero');
-  }
-  get fotoUrl() {
-    return this.candidatoForm.get('fotoUrl');
-  }
-  get partidoLogoUrl() {
-    return this.candidatoForm.get('partidoLogoUrl');
-  }
-  get idRegistrador() {
-    return this.candidatoForm.get('idRegistrador');
+  onEleccionChange() {
+    const eleccion = this.candidatoForm.get('eleccion')?.value;
+    this.cargosDisponibles = this.cargosMap[eleccion] || [];
+    this.candidatoForm.get('cargo')?.reset();
+    this.cdr.detectChanges();
   }
 
-  /**
-   * 🔹 Submit del formulario
-   */
-  onSubmit() {
-    if (this.candidatoForm.invalid) {
-      this.candidatoForm.markAllAsTouched();
+  onFileChange(event: any, tipo: string) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      alert('Solo se permiten archivos PDF');
+      event.target.value = '';
       return;
     }
 
-    this.formSubmit.emit(this.candidatoForm.value);
+    this.archivos = { ...this.archivos, [tipo]: { file, name: file.name } };
+    this.cdr.detectChanges();
   }
 
-  /**
-   * 🔹 Reset del formulario (para usar desde el padre)
-   */
+  removeFile(tipo: string) {
+    if (this.archivos[tipo]?.preview) {
+      URL.revokeObjectURL(this.archivos[tipo].preview);
+    }
+    delete this.archivos[tipo];
+    this.cdr.detectChanges();
+  }
+
+  onSubmit() {
+    if (this.candidatoForm.invalid) {
+      this.candidatoForm.markAllAsTouched();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const faltantes = this.fileTypes.filter((f) => !this.archivos[f.key]);
+    if (faltantes.length > 0) {
+      alert('Debes subir todos los documentos requeridos');
+      return;
+    }
+
+    const formData = new FormData();
+
+    // ✅ El back espera el JSON con Content-Type application/json
+    // Se envía como Blob igual que en el script .sh con ;type=application/json
+    const data = {
+      nombre: this.candidatoForm.value.nombre,
+      numero: '1', // campo requerido por el DTO — ajustar según flujo
+      activo: true,
+      idLista: 1, // ajustar cuando haya selector de lista
+      idPartido: 1, // ajustar cuando haya selector de partido
+      idRegistrador: 1, // ajustar cuando haya sesión real
+    };
+
+    formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
+    // ✅ Claves exactas que espera el back según el OpenAPI y el script .sh
+    formData.append('foto', this.archivos['foto'].file);
+    formData.append('formularioE6', this.archivos['e6'].file); // clave corregida
+    formData.append('certificado', this.archivos['cert'].file);
+    formData.append('cedula', this.archivos['cedula'].file);
+    formData.append('aval', this.archivos['aval'].file);
+
+    this.formSubmit.emit(formData);
+  }
+
   resetForm() {
-    this.candidatoForm.reset({
-      idRegistrador: 1,
+    Object.keys(this.archivos).forEach((key) => {
+      if (this.archivos[key]?.preview) URL.revokeObjectURL(this.archivos[key].preview);
     });
+    this.candidatoForm.reset();
+    this.cargosDisponibles = [];
+    this.archivos = {};
+    this.cdr.detectChanges();
+  }
+
+  goBack() {
+    window.history.back();
   }
 }

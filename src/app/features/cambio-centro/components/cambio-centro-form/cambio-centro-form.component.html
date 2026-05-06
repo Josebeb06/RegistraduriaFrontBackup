@@ -1,0 +1,64 @@
+<div class="form-card">
+  <!-- TOAST ERROR -->
+  <div class="inline-toast inline-toast--error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- TOAST SUCCESS -->
+  <div class="inline-toast inline-toast--success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <!-- HEADER -->
+  <div class="form-card__header">
+    <h2>Solicitud de traslado</h2>
+    <p>Complete los datos del ciudadano</p>
+  </div>
+
+  <div class="form-card__body">
+    <!-- CEDULA -->
+    <div class="field">
+      <label>Cédula</label>
+
+      <input class="field__input" [(ngModel)]="cedula" type="text" placeholder="1234567890" />
+
+      <div class="field__error" *ngIf="errorCedula">
+        {{ errorCedula }}
+      </div>
+    </div>
+
+    <!-- BOTON BUSCAR -->
+    <button class="btn-search" (click)="buscarCiudadano()">
+      {{ loadingSearch ? 'Buscando...' : 'Buscar ciudadano' }}
+    </button>
+
+    <!-- CIUDADANO -->
+    <div class="citizen-card" *ngIf="showCitizenCard">
+      <h3>{{ currentCitizen?.name }}</h3>
+      <p>{{ currentCitizen?.center }}</p>
+    </div>
+
+    <!-- SELECT -->
+    <div class="field" *ngIf="showCentroField">
+      <label>Nuevo centro</label>
+
+      <select [(ngModel)]="selectedCentro">
+        <option value="">Seleccione</option>
+        <option value="1">Bogotá</option>
+        <option value="2">Medellín</option>
+      </select>
+
+      <div class="field__error" *ngIf="errorCentro">
+        {{ errorCentro }}
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="form-actions" *ngIf="showConfirmButtons">
+      <button (click)="resetForm()">Cancelar</button>
+      <button (click)="cambiarCentro()">
+        {{ loadingSubmit ? 'Procesando...' : 'Cambiar centro' }}
+      </button>
+    </div>
+  </div>
+</div>

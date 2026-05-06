@@ -1,0 +1,5 @@
+<div class="container">
+  <app-partido-form (formSubmit)="onCrearPartido($event)"></app-partido-form>
+  <app-toast *ngIf="showToast" [message]="toastMessage" [type]="toastType" (close)="onCloseToast()">
+  </app-toast>
+</div>
